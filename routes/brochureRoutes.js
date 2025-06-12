@@ -136,7 +136,6 @@
 
 // module.exports = router;
 
-
 // routes/brochureRoutes.js
 const express = require('express');
 const router = express.Router();
@@ -160,9 +159,21 @@ const infoTransporter = nodemailer.createTransport({
   // debug: true,  // Uncomment this line for more detailed debugging info
 });
 
-// Define the path to your brochure PDF (This is for email attachment)
-const BROCHURE_PATH = path.join(__dirname, '..', 'brochures', 'public_health_brochure.pdf');
-console.log("Calculated BROCHURE_PATH:", BROCHURE_PATH);
+// --- Map of website domains to their corresponding brochure file paths on the BACKEND ---
+// IMPORTANT: You MUST place these PDF files in the 'brochures' directory
+// of your backend project. For example: backend/brochures/public_health_brochure.pdf
+const BROCHURE_PATHS_MAP = {
+    'publichealth.helixconferences.com': path.join(__dirname, '..', 'brochures', 'public_health_brochure.pdf'),
+    'example.com': path.join(__dirname, '..', 'brochures', 'example_brochure.pdf'), // Add your actual domains and file names here
+    'anotherdomain.net': path.join(__dirname, '..', 'brochures', 'another_domain_brochure.pdf'),
+    'localhost:3000': path.join(__dirname, '..', 'brochures', 'public_health_brochure.pdf'), // For local development testing
+    // Add all your other website domains and their specific brochure filenames here
+    // Example: 'mysite.com': path.join(__dirname, '..', 'brochures', 'mysite_brochure.pdf'),
+};
+
+// Fallback brochure path if a domain is not found in the map OR the specified brochure doesn't exist
+// IMPORTANT: Ensure 's_brochure.pdf' is present in your backend's 'brochures' directory.
+const FALLBACK_BROCHURE_PATH = path.join(__dirname, '..', 'brochures', 's_brochure.pdf');
 
 // --- API Route for Brochure Download Form ---
 router.post("/brochure-download", upload.none(), async (req, res) => {
@@ -181,7 +192,7 @@ router.post("/brochure-download", upload.none(), async (req, res) => {
     linkedin,
     twitter,
     interestedIn,
-    websiteDomain, // <-- NEW: Capture the website domain sent from the frontend
+    websiteDomain,
   } = req.body;
 
   // Basic validation for required fields
@@ -196,38 +207,46 @@ router.post("/brochure-download", upload.none(), async (req, res) => {
     !email ||
     !affiliation ||
     !interestedIn ||
-    !websiteDomain // <-- Ensure websiteDomain is also present
+    !websiteDomain
   ) {
     console.error("Brochure Download: Missing required fields or websiteDomain:", req.body);
     return res.status(400).send("All required fields must be filled for brochure download.");
   }
 
   // --- Dynamically set the Team Name for the email signature ---
-  let displayTeamName = "Our"; // Default if domain is not provided or malformed
+  let displayTeamName = "Our";
   if (websiteDomain) {
-    // Basic sanitization to get a cleaner name from the domain
-    const cleanedDomain = websiteDomain.replace(/^www\./, ''); // Remove 'www.'
+    const cleanedDomain = websiteDomain.replace(/^www\./, '');
     const parts = cleanedDomain.split('.');
     if (parts.length > 1) {
-      // Take the first part of the domain (e.g., "helixconferences" from "helixconferences.com")
       const baseName = parts[0];
-      displayTeamName = baseName.charAt(0).toUpperCase() + baseName.slice(1); // Capitalize first letter
+      displayTeamName = baseName.charAt(0).toUpperCase() + baseName.slice(1);
     } else {
         displayTeamName = websiteDomain.charAt(0).toUpperCase() + websiteDomain.slice(1);
     }
   }
 
+  // --- Determine the correct brochure to attach based on websiteDomain ---
+  let brochureFilePath = BROCHURE_PATHS_MAP[websiteDomain];
+
+  // Check if the specific brochure file exists, otherwise use fallback
+  if (!brochureFilePath || !require('fs').existsSync(brochureFilePath)) {
+    console.warn(`Brochure not found for domain: ${websiteDomain}. Using fallback brochure.`);
+    brochureFilePath = FALLBACK_BROCHURE_PATH;
+  }
+  
+  const brochureFilename = path.basename(brochureFilePath); // Get just the filename from the path
 
   // --- Send Email to Administrator (Internal Notification) ---
   const adminMailOptions = {
     from: process.env.EMAIL_USER_INFO,
     to: process.env.RECIPIENT_EMAIL_INFO,
-    subject: `New Brochure Download Request from ${firstName} ${lastName} (from ${websiteDomain})`, // Add domain to subject
+    subject: `New Brochure Download Request from ${firstName} ${lastName} (from ${websiteDomain})`,
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
         <h2 style="color: #333;">Brochure Download Details</h2>
         <hr>
-        <p><strong>Website Domain:</strong> ${websiteDomain}</p> <!-- Show domain in admin email -->
+        <p><strong>Website Domain:</strong> ${websiteDomain}</p>
         <p><strong>Name:</strong> ${firstName} ${lastName}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Mobile Number:</strong> ${mobileNumber}</p>
@@ -249,7 +268,7 @@ router.post("/brochure-download", upload.none(), async (req, res) => {
   const userMailOptions = {
     from: process.env.EMAIL_USER_INFO,
     to: email,
-    subject: `Your Brochure Download from ${displayTeamName} - Thank You!`, // Dynamically set subject
+    subject: `Your Brochure Download from ${displayTeamName} - Thank You!`,
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
         <h2 style="color: #333;">Thank You for Your Interest!</h2>
@@ -259,25 +278,24 @@ router.post("/brochure-download", upload.none(), async (req, res) => {
         <p>We look forward to connecting with you.</p>
         <br>
         <p>Best regards,</p>
-        <p>The ${displayTeamName} Team</p> <!-- Dynamically set based on domain -->
+        <p>The ${displayTeamName} Team</p>
       </div>
     `,
     attachments: [
       {
-        filename: 'public_health_brochure.pdf',
-        path: BROCHURE_PATH,
+        filename: brochureFilename, // <-- DYNAMIC FILENAME
+        path: brochureFilePath,     // <-- DYNAMIC PATH TO THE BROCHURE FILE ON THE BACKEND
         contentType: 'application/pdf',
       },
     ],
   };
 
   try {
-    // Send emails using the infoTransporter
     await infoTransporter.sendMail(adminMailOptions);
     console.log("Admin notification email sent for brochure download.");
 
     await infoTransporter.sendMail(userMailOptions);
-    console.log("Brochure download confirmation email sent to user.");
+    console.log("Brochure download confirmation email sent to user with dynamic attachment.");
 
     res.status(200).send("Form submitted and brochure sent to your email!");
 
