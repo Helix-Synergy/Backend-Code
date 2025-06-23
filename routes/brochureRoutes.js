@@ -352,15 +352,16 @@ const BROCHURE_PATHS_MAP = {
     'publichealth.helixconferences.com': path.join(__dirname, '..', 'brochures', 'public_health_brochure.pdf'),
     'localhost:3000': path.join(__dirname, '..', 'brochures', 'public_health_brochure.pdf'), // For local development testing
 
-    // --- Mappings based on your provided website domains and brochure filenames ---
-    'arm.helixconferences.com': path.join(__dirname, '..', 'brochures', 'arm_brochure.pdf'),
-    'ican.helixconferences.com': path.join(__dirname, '..', 'brochures', 'ican_brochure.pdf'),
-    'gent.helixconferences.com': path.join(__dirname, '..', 'brochures', 'gent_brochure.pdf'),
-    'idom.helixconferences.com': path.join(__dirname, '..', 'brochures', 'idom_brochure.pdf'),
+    // --- Mappings based on your provided website domains and brochure filenames (CORRECTED CASE) ---
+    'arm.helixconferences.com': path.join(__dirname, '..', 'brochures', 'ARM_brochure.pdf'), // <-- CORRECTED
+    'ican.helixconferences.com': path.join(__dirname, '..', 'brochures', 'ICAN_brochure.pdf'), // <-- CORRECTED
+    'gent.helixconferences.com': path.join(__dirname, '..', 'brochures', 'GENT_brochure.pdf'), // <-- CORRECTED
+    'idom.helixconferences.com': path.join(__dirname, '..', 'brochures', 'IDOM_brochure.pdf'), // <-- CORRECTED
     'pharmatech.helixconferences.com': path.join(__dirname, '..', 'brochures', 'pharmatech_brochure.pdf'),
     'biocon.helixconferences.com': path.join(__dirname, '..', 'brochures', 'biocon_brochure.pdf'),
     'foodmeet.helixconferences.com': path.join(__dirname, '..', 'brochures', 'foodmeet_brochure.pdf'),
     'mediclave.helixconferences.com': path.join(__dirname, '..', 'brochures', 'mediclave_brochure.pdf'),
+    // Add all your other website domains and their specific brochure filenames here
     // Example: 'mysite.com': path.join(__dirname, '..', 'brochures', 'mysite_brochure.pdf'),
 };
 
