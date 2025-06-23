@@ -163,11 +163,19 @@ const infoTransporter = nodemailer.createTransport({
 // IMPORTANT: You MUST place these PDF files in the 'brochures' directory
 // of your backend project. For example: backend/brochures/public_health_brochure.pdf
 const BROCHURE_PATHS_MAP = {
+    // Existing and verified mappings:
     'publichealth.helixconferences.com': path.join(__dirname, '..', 'brochures', 'public_health_brochure.pdf'),
-    'example.com': path.join(__dirname, '..', 'brochures', 'example_brochure.pdf'), // Add your actual domains and file names here
-    'anotherdomain.net': path.join(__dirname, '..', 'brochures', 'another_domain_brochure.pdf'),
     'localhost:3000': path.join(__dirname, '..', 'brochures', 'public_health_brochure.pdf'), // For local development testing
-    // Add all your other website domains and their specific brochure filenames here
+
+    // --- Mappings based on your provided website domains and brochure filenames ---
+    'arm.helixconferences.com': path.join(__dirname, '..', 'brochures', 'arm_brochure.pdf'),
+    'ican.helixconferences.com': path.join(__dirname, '..', 'brochures', 'ican_brochure.pdf'),
+    'gent.helixconferences.com': path.join(__dirname, '..', 'brochures', 'gent_brochure.pdf'),
+    'idom.helixconferences.com': path.join(__dirname, '..', 'brochures', 'idom_brochure.pdf'),
+    'pharmatech.helixconferences.com': path.join(__dirname, '..', 'brochures', 'pharmatech_brochure.pdf'),
+    'biocon.helixconferences.com': path.join(__dirname, '..', 'brochures', 'biocon_brochure.pdf'),
+    'foodmeet.helixconferences.com': path.join(__dirname, '..', 'brochures', 'foodmeet_brochure.pdf'),
+    'mediclave.helixconferences.com': path.join(__dirname, '..', 'brochures', 'mediclave_brochure.pdf'),
     // Example: 'mysite.com': path.join(__dirname, '..', 'brochures', 'mysite_brochure.pdf'),
 };
 
