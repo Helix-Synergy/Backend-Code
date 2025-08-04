@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulated Hostinger Site A</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
+        button { padding: 15px 30px; font-size: 1.2em; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; }
+        button:hover { background-color: #45a049; }
+        p { margin-top: 20px; font-size: 1em; color: #555; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to Simulated Conference Site A</h1>
+    <p>This site promotes a conference. Click below to register!</p>
+    <button id="registerButton">Register Now</button>
+    <p>This site's ID: <strong id="siteIdDisplay"></strong></p>
+
+    <script>
+        // --- IMPORTANT: Change this for each simulated site ---
+        const SOURCE_SITE_ID = "hostinger_site_1"; // Matches an entry in VALID_SOURCE_IDS in your backend
+        const BACKEND_URL = "http://localhost:5000"; // Your local backend URL
+        const REACT_APP_URL = "http://localhost:3000"; // Your local React app URL
+
+        document.getElementById('siteIdDisplay').textContent = SOURCE_SITE_ID;
+
+        document.getElementById('registerButton').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/source/generate-token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ sourceId: SOURCE_SITE_ID })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to get source token');
+                }
+
+                const data = await response.json();
+                const token = data.token;
+
+                console.log(`Token received: ${token}`);
+                // Redirect to React app with the token
+                window.location.href = `${REACT_APP_URL}/registration/${SOURCE_SITE_ID}?sourceToken=${token}`;
+
+            } catch (error) {
+                console.error("Error generating token or redirecting:", error);
+                alert("Could not start registration. Please try again later.");
+            }
+        });
+
+        // Optional: Simulate the Socket.IO popup
+        // You would need to include the Socket.IO client library (e.g., via CDN)
+        // and connect it to your backend's Socket.IO server.
+        // For a simple test, just focus on the registration flow first.
+        // <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+        // const socket = io(BACKEND_URL);
+        // socket.on('new_registration', (data) => {
+        //     alert(`🥳 New Registration: ${data.name} (${data.email}) just registered for ${data.plan}!`);
+        //     // Implement more sophisticated dynamic popup here
+        // });
+    </script>
+</body>
+</html>
