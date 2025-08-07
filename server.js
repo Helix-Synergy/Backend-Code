@@ -165,6 +165,7 @@ const allowedFrontendOrigins = [
     process.env.FRONTEND_URL,
     'http://192.168.0.195:3000',
     'http://127.0.0.1:3000',
+    'https://helix-scientific-conferences.vercel.app',
     ...Array.from({ length: 60 }, (_, i) => process.env[`HOSTINGER_SITE_${i + 1}_URL`]).filter(Boolean)
 ];
 
