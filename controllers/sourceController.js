@@ -252,412 +252,434 @@ const { signToken, verifyToken } = require('../utils/jwt');
 // This structure holds year-specific pricing for each plan and its add-ons
 // You MUST populate this with your actual conference plans, features, and add-ons for each year.
 const conferencePricingData = {
-    // Hybrid Conferences
-    "hybrid": {
-        "2025": [ // 2025 Prices
-            {
-                planId: "hybrid_e_poster_2025",
-                name: "E-Poster Presentation",
-                basePrice: 139.00,
-                features: [
-                    "Dedicated e-poster display area",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
-                    { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
-                    { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2025", name: "Exhibitor Booth", price: 2089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_poster_2025",
-                name: "Poster Presentation",
-                basePrice: 239.00,
-                features: [
-                    "Dedicated poster display area",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
-                    { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
-                    { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2025", name: "Exhibitor Booth", price: 2089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_video_2025",
-                name: "Video Presentation",
-                basePrice: 289.00,
-                features: [
-                    "Pre-recorded video presentation slot",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
-                    { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
-                    { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2025", name: "Exhibitor Booth", price: 2089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_virtual_2025",
-                name: "Virtual Presentation",
-                basePrice: 389.00,
-                features: [
-                    "Live virtual presentation slot",
-                    "Interactive Q&A session",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
-                    { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
-                    { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2025", name: "Exhibitor Booth", price: 2089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_oral_2025",
-                name: "Oral Presentation",
-                basePrice: 889.00,
-                features: [
-                    "20-minute presentation slot",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
-                    { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
-                    { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2025", name: "Exhibitor Booth", price: 2089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_delegate_2025",
-                name: "Delegate Access",
-                basePrice: 329.00,
-                features: [
-                    "Access to all conference sessions",
-                    "Networking opportunities",
-                    "Conference Kit",
-                    "Certificate of Participation"
-                ],
-                addOns: [
-                    { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
-                    { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
-                    { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2025", name: "Exhibitor Booth", price: 2089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_suit_a_2025",
-                name: "Suit - A (OP + 2N stay)",
-                basePrice: 1189.00,
-                features: [
-                    "Oral Presentation (20 min slot)", "2 Nights Hotel Stay", "All conference access",
-                    "Publication in proceedings", "Certificate", "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
-                    { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
-                    { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_suit_b_2025",
-                name: "Suit - B (OP + 3N stay)",
-                basePrice: 1389.00,
-                features: [
-                    "Oral Presentation (20 min slot)", "3 Nights Hotel Stay", "All conference access",
-                    "Publication in proceedings", "Certificate", "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
-                    { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
-                    { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
-                ]
-            }
+  // Hybrid Conferences
+  "hybrid": {
+    "2025": [ // 2025 Prices
+      {
+        planId: "hybrid_e_poster_2025",
+        name: "E-Poster Presentation",
+        basePrice: 139.00,
+        features: [
+          "Digital e-poster Display",
+          "Abstract in Conference Proceedings",
+          "Certificate of Presentation"
         ],
-        "2026": [ // 2026 Prices
-            {
-                planId: "hybrid_e_poster_2026",
-                name: "E-Poster Presentation",
-                basePrice: 199.00,
-                features: [
-                    "Dedicated e-poster display area",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
-                    { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
-                    { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2026", name: "Exhibitor Booth", price: 3999.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_poster_2026",
-                name: "Poster Presentation",
-                basePrice: 349.00,
-                features: [
-                    "Dedicated poster display area",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
-                    { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
-                    { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2026", name: "Exhibitor Booth", price: 3999.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_video_2026",
-                name: "Video Presentation",
-                basePrice: 449.00,
-                features: [
-                    "Pre-recorded video presentation slot",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
-                    { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
-                    { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2026", name: "Exhibitor Booth", price: 3999.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_virtual_2026",
-                name: "Virtual Presentation",
-                basePrice: 599.00,
-                features: [
-                    "Live virtual presentation slot",
-                    "Interactive Q&A session",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
-                    { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
-                    { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2026", name: "Exhibitor Booth", price: 3999.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_oral_2026",
-                name: "Oral Presentation",
-                basePrice: 899.00,
-                features: [
-                    "20-minute presentation slot",
-                    "Publication in conference proceedings",
-                    "Certificate of Presentation",
-                    "Access to all sessions",
-                    "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
-                    { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
-                    { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2026", name: "Exhibitor Booth", price: 3999.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_delegate_2026",
-                name: "Delegate Access",
-                basePrice: 349.00,
-                features: [
-                    "Access to all conference sessions",
-                    "Networking opportunities",
-                    "Conference Kit",
-                    "Certificate of Participation"
-                ],
-                addOns: [
-                    { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
-                    { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
-                    { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_hybrid_2026", name: "Exhibitor Booth", price: 3999.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_suit_a_2026",
-                name: "Suit - A (OP + 2N stay)",
-                basePrice: 1199.00,
-                features: [
-                    "Oral Presentation (20 min slot)", "2 Nights Hotel Stay", "All conference access",
-                    "Publication in proceedings", "Certificate", "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
-                    { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
-                    { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "hybrid_suit_b_2026",
-                name: "Suit - B (OP + 3N stay)",
-                basePrice: 1399.00,
-                features: [
-                    "Oral Presentation (20 min slot)", "3 Nights Hotel Stay", "All conference access",
-                    "Publication in proceedings", "Certificate", "Networking events"
-                ],
-                addOns: [
-                    { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
-                    { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
-                    { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
-                ]
-            }
+        addOns: [
+          { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+          { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+          { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
         ]
-    },
-    // Webinar Conferences
-    "webinar": {
-        "2025": [ // 2025 Prices
-            {
-                planId: "webinar_e_poster_2025",
-                name: "E-Poster Presentation",
-                basePrice: 129.00,
-                features: [
-                    "Digital poster display",
-                    "Publication in e-proceedings",
-                    "Certificate of Presentation",
-                    "Online access to all webinar sessions"
-                ],
-                addOns: [
-                    { id: "article_pub_webinar_2025", name: "Article Publication (Additional)", price: 989.00, perAttendee: false },
-                    { id: "exhibitor_webinar_2025", name: "Virtual Exhibitor Booth", price: 1089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "webinar_video_2025",
-                name: "Video Presentation",
-                basePrice: 289.00,
-                features: [
-                    "Pre-recorded video presentation slot",
-                    "Publication in e-proceedings",
-                    "Certificate of Presentation",
-                    "Online access to all webinar sessions"
-                ],
-                addOns: [
-                    { id: "article_pub_webinar_2025", name: "Article Publication (Additional)", price: 989.00, perAttendee: false },
-                    { id: "exhibitor_webinar_2025", name: "Virtual Exhibitor Booth", price: 1089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "webinar_virtual_2025",
-                name: "Virtual Presentation",
-                basePrice: 389.00,
-                features: [
-                    "Live virtual presentation slot",
-                    "Interactive Q&A session",
-                    "Publication in e-proceedings",
-                    "Certificate of Presentation",
-                    "Online access to all webinar sessions"
-                ],
-                addOns: [
-                    { id: "article_pub_webinar_2025", name: "Article Publication (Additional)", price: 989.00, perAttendee: false },
-                    { id: "exhibitor_webinar_2025", name: "Virtual Exhibitor Booth", price: 1089.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "webinar_delegate_2025",
-                name: "Delegate Access",
-                basePrice: 149.00,
-                features: [
-                    "Online access to all webinar sessions",
-                    "Digital Certificate of Participation",
-                    "Q&A opportunities with speakers"
-                ],
-                addOns: [
-                    { id: "article_pub_webinar_2025", name: "Article Publication (Additional)", price: 989.00, perAttendee: false },
-                    { id: "exhibitor_webinar_2025", name: "Virtual Exhibitor Booth", price: 1089.00, perAttendee: false }
-                ]
-            }
+      },
+      {
+        planId: "hybrid_poster_2025",
+        name: "Poster Presentation",
+        basePrice: 239.00,
+        features: [
+          "Boost your Profile",
+          "Networking",
+          "Certificate of Presentation"
         ],
-        "2026": [ // 2026 Prices
-            {
-                planId: "webinar_e_poster_2026",
-                name: "E-Poster Presentation",
-                basePrice: 149.00,
-                features: [
-                    "Digital poster display",
-                    "Publication in e-proceedings",
-                    "Certificate of Presentation",
-                    "Online access to all webinar sessions"
-                ],
-                addOns: [
-                    { id: "article_pub_webinar_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_webinar_2026", name: "Virtual Exhibitor Booth", price: 1999.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "webinar_video_2026",
-                name: "Video Presentation",
-                basePrice: 399.00,
-                features: [
-                    "Pre-recorded video presentation slot",
-                    "Publication in e-proceedings",
-                    "Certificate of Presentation",
-                    "Online access to all webinar sessions"
-                ],
-                addOns: [
-                    { id: "article_pub_webinar_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_webinar_2026", name: "Virtual Exhibitor Booth", price: 1999.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "webinar_virtual_2026",
-                name: "Virtual Presentation",
-                basePrice: 499.00,
-                features: [
-                    "Live virtual presentation slot",
-                    "Interactive Q&A session",
-                    "Publication in e-proceedings",
-                    "Certificate of Presentation",
-                    "Online access to all webinar sessions"
-                ],
-                addOns: [
-                    { id: "article_pub_webinar_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_webinar_2026", name: "Virtual Exhibitor Booth", price: 1999.00, perAttendee: false }
-                ]
-            },
-            {
-                planId: "webinar_delegate_2026",
-                name: "Delegate Access",
-                basePrice: 349.00,
-                features: [
-                    "Online access to all webinar sessions",
-                    "Digital Certificate of Participation",
-                    "Q&A opportunities with speakers"
-                ],
-                addOns: [
-                    { id: "article_pub_webinar_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false },
-                    { id: "exhibitor_webinar_2026", name: "Virtual Exhibitor Booth", price: 1999.00, perAttendee: false }
-                ]
-            }
+        addOns: [
+          { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+          { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+          { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
         ]
-    }
+      },
+      {
+        planId: "hybrid_video_2025",
+        name: "Video Presentation",
+        basePrice: 289.00,
+        features: [
+          "10-15 minutes Video Slot",
+          "Online Access for 1 hour",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+          { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+          { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_virtual_2025",
+        name: "Virtual Presentation",
+        basePrice: 389.00,
+        features: [
+          "Online Slot for 20 minutes",
+          "Global Networking",
+          "Promotions",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+          { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+          { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_oral_2025",
+        name: "Oral Presentation",
+        basePrice: 889.00,
+        features: [
+          "Keynote Slot Eligibility",
+          "Promotions",
+          "Conference Kit",
+          "Networking Access"
+        ],
+        addOns: [
+          { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+          { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+          { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_delegate_2025",
+        name: "Delegate Access",
+        basePrice: 329.00,
+        features: [
+          "Access to all sessions",
+          "Conference Handbook",
+          "Coffee Break & Lunch",
+          "Networking Opportunities"
+        ],
+        addOns: [
+          { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+          { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+          { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_suit_a_2025",
+        name: "Suit - A (OP + 2N stay)",
+        basePrice: 1189.00,
+        features: [
+          "Oral Presentation",
+          "2 Night’s Accommodation",
+          "Shuttle Service",
+          "Certificate & Promotions",
+          "Queen Size Room"
+        ],
+        addOns: [
+          { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+          { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+          { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_suit_b_2025",
+        name: "Suit - B (OP + 3N stay)",
+        basePrice: 1389.00,
+        features: [
+          "Oral Presentation",
+          "3 Night’s Accommodation",
+          "Shuttle Service",
+          "Certificate & Promotions",
+          "Queen Size Room"
+        ],
+        addOns: [
+          { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+          { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+          { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_exhibitor_2025",
+        name: "Exhibitor Booth",
+        basePrice: 2089.00,
+        features: [
+          "Brand Exposure",
+          "Product Showcasing",
+          "Partnership Potential",
+          "Logo in Conference Proceedings",
+          "Promoting Globally"
+        ],
+        addOns: []
+      }
+    ],
+    "2026": [ // 2026 Prices
+      {
+        planId: "hybrid_e_poster_2026",
+        name: "E-Poster Presentation",
+        basePrice: 199.00,
+        features: [
+          "Digital e-poster Display",
+          "Abstract in Conference Proceedings",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+          { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+          { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_poster_2026",
+        name: "Poster Presentation",
+        basePrice: 349.00,
+        features: [
+          "Boost your Profile",
+          "Networking",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+          { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+          { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_video_2026",
+        name: "Video Presentation",
+        basePrice: 449.00,
+        features: [
+          "10-15 minutes Video Slot",
+          "Online Access for 1 hour",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+          { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+          { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_virtual_2026",
+        name: "Virtual Presentation",
+        basePrice: 599.00,
+        features: [
+          "Online Slot for 20 minutes",
+          "Global Networking",
+          "Promotions",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+          { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+          { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_oral_2026",
+        name: "Oral Presentation",
+        basePrice: 899.00,
+        features: [
+          "Keynote Slot Eligibility",
+          "Promotions",
+          "Conference Kit",
+          "Networking Access"
+        ],
+        addOns: [
+          { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+          { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+          { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_delegate_2026",
+        name: "Delegate Access",
+        basePrice: 349.00,
+        features: [
+          "Access to all sessions",
+          "Conference Handbook",
+          "Coffee Break & Lunch",
+          "Networking Opportunities"
+        ],
+        addOns: [
+          { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+          { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+          { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_suit_a_2026",
+        name: "Suit - A (OP + 2N stay)",
+        basePrice: 1199.00,
+        features: [
+          "Oral Presentation",
+          "2 Night’s Accommodation",
+          "Shuttle Service",
+          "Certificate & Promotions",
+          "Queen Size Room"
+        ],
+        addOns: [
+          { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+          { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+          { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_suit_b_2026",
+        name: "Suit - B (OP + 3N stay)",
+        basePrice: 1399.00,
+        features: [
+          "Oral Presentation",
+          "3 Night’s Accommodation",
+          "Shuttle Service",
+          "Certificate & Promotions",
+          "Queen Size Room"
+        ],
+        addOns: [
+          { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+          { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+          { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "hybrid_exhibitor_2026",
+        name: "Exhibitor Booth",
+        basePrice: 3999.00,
+        features: [
+          "Brand Exposure",
+          "Product Showcasing",
+          "Partnership Potential",
+          "Logo in Conference Proceedings",
+          "Promoting Globally"
+        ],
+        addOns: []
+      }
+    ]
+  },
+  // Webinar Conferences
+  "webinar": {
+    "2025": [ // 2025 Prices
+      {
+        planId: "webinar_e_poster_2025",
+        name: "E-Poster Presentation",
+        basePrice: 129.00,
+        features: [
+          "Digital e-poster Display",
+          "Abstract in Conference Proceedings",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "article_pub_webinar_2025", name: "Article Publication (Additional)", price: 989.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "webinar_video_2025",
+        name: "Video Presentation",
+        basePrice: 289.00,
+        features: [
+          "10-15 minutes Video Slot",
+          "Online Access for 1 hour",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "article_pub_webinar_2025", name: "Article Publication (Additional)", price: 989.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "webinar_virtual_2025",
+        name: "Virtual Presentation",
+        basePrice: 389.00,
+        features: [
+          "Online Slot for 20 minutes",
+          "Global Networking",
+          "Promotions",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "article_pub_webinar_2025", name: "Article Publication (Additional)", price: 989.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "webinar_delegate_2025",
+        name: "Delegate Access",
+        basePrice: 149.00,
+        features: [
+          "Access to all sessions",
+          "Conference Handbook",
+          "Coffee Break & Lunch",
+          "Networking Opportunities"
+        ],
+        addOns: [
+          { id: "article_pub_webinar_2025", name: "Article Publication (Additional)", price: 989.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "webinar_exhibitor_2025",
+        name: "Virtual Exhibitor Booth",
+        basePrice: 1089.00,
+        features: [
+          "Brand Exposure",
+          "Product Showcasing",
+          "Partnership Potential",
+          "Logo in Conference Proceedings",
+          "Promoting Globally"
+        ],
+        addOns: []
+      }
+    ],
+    "2026": [ // 2026 Prices
+      {
+        planId: "webinar_e_poster_2026",
+        name: "E-Poster Presentation",
+        basePrice: 149.00,
+        features: [
+          "Digital e-poster Display",
+          "Abstract in Conference Proceedings",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "article_pub_webinar_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "webinar_video_2026",
+        name: "Video Presentation",
+        basePrice: 399.00,
+        features: [
+          "10-15 minutes Video Slot",
+          "Online Access for 1 hour",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "article_pub_webinar_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "webinar_virtual_2026",
+        name: "Virtual Presentation",
+        basePrice: 499.00,
+        features: [
+          "Online Slot for 20 minutes",
+          "Global Networking",
+          "Promotions",
+          "Certificate of Presentation"
+        ],
+        addOns: [
+          { id: "article_pub_webinar_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "webinar_delegate_2026",
+        name: "Delegate Access",
+        basePrice: 349.00,
+        features: [
+          "Access to all sessions",
+          "Conference Handbook",
+          "Coffee Break & Lunch",
+          "Networking Opportunities"
+        ],
+        addOns: [
+          { id: "article_pub_webinar_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+        ]
+      },
+      {
+        planId: "webinar_exhibitor_2026",
+        name: "Virtual Exhibitor Booth",
+        basePrice: 1999.00,
+        features: [
+          "Brand Exposure",
+          "Product Showcasing",
+          "Partnership Potential",
+          "Logo in Conference Proceedings",
+          "Promoting Globally"
+        ],
+        addOns: []
+      }
+    ]
+  }
 };
 // --- END Centralized Pricing Data ---
 
@@ -678,37 +700,18 @@ const allowedSources = {
     "NEST-2025": { name: "Global Summit on Nano Engineering & Smart Technology", conferenceType: "webinar" },
 
     // 2026 Webinars (Upcoming) - CRITICAL: MATCH FRONTEND EXACTLY
-    "GENE-2026": { name: "World Gene Therapy Summit", conferenceType: "webinar" },
-    "STEM-2026": { name: "Global Stemcell Meet", conferenceType: "webinar" },
-    "IMMUNO-2026": { name: "International Immunotherapy Conclave", conferenceType: "webinar" },
-    "IBS-2026": { name: "International Biosensors Summit", conferenceType: "webinar" },
-    "BATTERY-2026": { name: "Global Battery Tech Summit", conferenceType: "webinar" },
-    "BIOELECTRONICS-2026": { name: "World Bioelectronics Conclave", conferenceType: "webinar" },
-    "VACCINE-2026": { name: "Global Vaccine Technology Summit", conferenceType: "webinar" },
-    "GENOMICS-2026": { name: "World Genomics Conclave", conferenceType: "webinar" },
-    "GPS-2026-WEBINAR": { name: "Global Proteomics Summit", conferenceType: "webinar" }, // This should be correct for webinar now
-    "BIGDATA-2026": { name: "Global Bigdata Summit", conferenceType: "webinar" },
-    "DATAANALYTICS-2026": { name: "World Data Analytics Conclave", conferenceType: "webinar" },
-    "BLOCKCHAIN-2026": { name: "Global Block Chain Summit", conferenceType: "webinar" },
-    "GREEN-2026": { name: "Global Green Chemistry Conclave", conferenceType: "webinar" },
-    "BIOFUEL-2026": { name: "World Biofuels Conclave", conferenceType: "webinar" },
-    "FERMENTATION-2026": { name: "Global Fermentation Technology Summit", conferenceType: "webinar" },
-    "FOOD-2026": { name: "World Symposia on Food Chemistry", conferenceType: "webinar" },
-    "RENEWABLE-2026": { name: "World Renewable Energy Conclave", conferenceType: "webinar" },
-    "HYDROGEN-2026": { name: "Global Green Hydrogen Summit", conferenceType: "webinar" },
-    "QUANTUM-2026": { name: "International Quantum Computing Conclave", conferenceType: "webinar" },
-    "BIOMECHANICS-2026": { name: "Global Biomechanics Summit", conferenceType: "webinar" },
-    "CYBER-2026": { name: "Global Cybersecurity Summit", conferenceType: "webinar" },
-    "META-2026": { name: "Global Symposia on Metaverse", conferenceType: "webinar" },
-    "MACHINELEARNING-2026": { name: "International Machine Learning Summit", conferenceType: "webinar" },
-    "AR-2026": { name: "Global Conclave on Augmented Reality", conferenceType: "webinar" },
-    "NEST-2026": { name: "Global Summit on Nano Engineering & Smart Technology", conferenceType: "webinar" },
-    "NANO-2026": { name: "World Nano Summit", conferenceType: "webinar" },
-    "IGC-2026": { name: "International Graphene Conclave", conferenceType: "webinar" },
-    "CLOUD-2026": { name: "International Conference on Cloud Computing", conferenceType: "webinar" },
-    "AIR-2026": { name: "International Artificial Intelligence & Robotics Conclave", conferenceType: "webinar" },
-    "AEROTECH-2026": { name: "Global Aerospace Engineering Conclave", conferenceType: "webinar" },
-
+    "GHS-2026": { name: "Global Health Summit", conferenceType: "webinar" },
+    "Emergency-2026": { name: "International Conference on Emergency Medicine & Trauma", conferenceType: "webinar" },
+    "Stroke-2026": { name: "World Stroke & Care Congress", conferenceType: "webinar" },
+    "Agrisummit-2026": { name: "International Conference on Food, Agriculture & Environmental Sciences", conferenceType: "webinar" },
+    "Bioteck-2026": { name: "Global Congress on Plant Biology & Biotechnology", conferenceType: "webinar" },
+    "Genomics-2026": { name: "International Genomics & Molecular Biology Summit", conferenceType: "webinar" },
+    "Scitech-2026": { name: "International Conference on Advances in Science, Engineering & Technology", conferenceType: "webinar" },
+    "Matsciences-2026": { name: "International Conference on Materials Science & Engineering", conferenceType: "webinar" },
+    "AIML-2026": { name: "International Conference on Artificial Intelligence & Machine Learning", conferenceType: "webinar" },
+    "Drug-2026": { name: "Symposium on Drug Design & Pharmaceutical Sciences", conferenceType: "webinar" },
+    "Pharmacology-2026": { name: "World Congress on Pharmacology & Future Therapies", conferenceType: "webinar" },
+    "Clinicaltrials-2026": { name: "Global Summit on Pharmacovigilance & Clinical Trials", conferenceType: "webinar" },
 
     // 2025 Hybrid Events (Matching frontend data if applicable)
     "FOODMEET-2025": { name: "World Agriculture & Food Sciences Conclave", conferenceType: "hybrid" },
@@ -717,39 +720,14 @@ const allowedSources = {
     "BIOCON-2025": { name: "World Biotechnology Summit", conferenceType: "hybrid" },
     "MEDICLAVE-2025": { name: "Global Medical Conclave", conferenceType: "hybrid" },
     "PUBLICHEALTH-2025": { name: "International Conferences On Public Health & Nursing", conferenceType: "hybrid" },
-    "GBS-2025": { name: "Global Bioinformatics Summit", conferenceType: "hybrid" },
+    // "GBS-2025": { name: "Global Bioinformatics Summit", conferenceType: "hybrid" }, // Removed from 2026 data, so commenting out for consistency
     "HEALTH SCIENCES-2025": { name: "International Health Sciences Conclave", conferenceType: "hybrid" },
 
-
     // 2026 Hybrid Events (Upcoming) - CRITICAL: MATCH FRONTEND EXACTLY
-    "PHARMAMEET-2026": { name: "International Pharmaceutical Summit", conferenceType: "hybrid" },
-    "PHARMACY-2026": { name: "World Pharmacy Conclave", conferenceType: "hybrid" },
-    "NURSING-2026": { name: "World Nursing Summit", conferenceType: "hybrid" },
-    "SURGICAL NURSING-2026": { name: "World Medical-Surgical Nursing Summit", conferenceType: "hybrid" },
-    "CRITICAL CARE-2026": { name: "International Critical Care Nursing Conclave", conferenceType: "hybrid" },
-    "ENVIRONMENTAL CHEMISTRY-2026": { name: "World Summit on Environmental Chemistry", conferenceType: "hybrid" },
-    "BIOCHEMISTRY-2026": { name: "International Conferences on Biochemistry", conferenceType: "hybrid" },
-    "ICC-2026": { name: "International Chemistry Conclave", conferenceType: "hybrid" },
-    "MEDICLAVE-2026": { name: "Global Medical Conclave", conferenceType: "hybrid" },
-    "Environmental Medicine-2026": { name: "World Environmental Medicine Summit", conferenceType: "hybrid" },
-    "FOODMEET-2026": { name: "World Agriculture & Food Sciences Conclave", conferenceType: "hybrid" },
-    "AGRITECH-2026": { name: "Global Agricultural Technology Conclave", conferenceType: "hybrid" },
-    "FOODTECH-2026": { name: "International Food Technology Congress", conferenceType: "hybrid" },
-    "GPS-2026": { name: "Global Physics Summit", conferenceType: "hybrid" },
-    "MATERIAL SCIENCES-2026": { name: "International Material Sciences Summit", conferenceType: "hybrid" },
-    "EARTH SCIENCES-2026": { name: "World Earth Science Summit", conferenceType: "hybrid" },
-    "TECHMATICS-2026": { name: "International Science & Technology Summit", conferenceType: "hybrid" },
-    "BIOMED-2026": { name: "International Conferences on Biomedical Engineering", conferenceType: "hybrid" },
-    "INDUSTRIAL ENGINEERING-2026": { name: "World Summit on Industrial Engineering", conferenceType: "hybrid" },
-    "NANOTECHNOLOGY-2026": { name: "Global Nanotechnology Summit", conferenceType: "hybrid" },
-    "NANOMATERIALS-2026": { name: "International Nanomaterials Conclave", conferenceType: "hybrid" },
-    "NANOMEDICINE-2026": { name: "World Nanomedicine Summit", conferenceType: "hybrid" },
-    "WBC-2026": { name: "World Biofuel Congress", conferenceType: "hybrid" },
-    "IBC-2026": { name: "International Biotechnology Conclave", conferenceType: "hybrid" },
-    "STEMCELL-2026": { name: "Global Stem Cell & Regenerative Medicine Summit", conferenceType: "hybrid" },
-    "AI-HEALTHCARE-2026": { name: "World Summit on Artificial Intelligence in Healthcare", conferenceType: "hybrid" },
-    "CLIMATE-2026": { name: "International Conferences on Climate Engineering", conferenceType: "hybrid" },
-    "FORENSICS-2026": { name: "Global Conclave on Forensic Sciences", conferenceType: "hybrid" },
+    "Healthcare-2026": { name: "World Healthcare Summit", conferenceType: "hybrid" },
+    "Antibiotics-2026": { name: "World Congress on Infectious Diseases & Antibiotics", conferenceType: "hybrid" },
+    "Cardiology-2026": { name: "International Conference on Cardiology", conferenceType: "hybrid" },
+    "Cancer-2026": { name: "Global Summit on Cancer & Research", conferenceType: "hybrid" },
 };
 // --- END Allowed Sources ---
 
