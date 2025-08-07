@@ -27,7 +27,7 @@ router.post('/send-registration-email', async (req, res) => {
     let itemsHtml = '<ul style="list-style-type: none; padding: 0;">';
     for (const category in selectedItems) {
         const item = selectedItems[category];
-        itemsHtml += `<li style="margin-bottom: 5px;"><strong>${category}:</strong> Quantity - ${item.quantity}, Type - ${item.type}</li>`;
+        itemsHtml += `<li style="margin-bottom: 5px;"><strong>${category}:</strong> Quantity - ${item.quantity}</li>`;
     }
     itemsHtml += '</ul>';
 
@@ -37,27 +37,29 @@ router.post('/send-registration-email', async (req, res) => {
         bcc: process.env.EMAIL_USER,  // BCC yourself for records
         subject: `Registration Confirmation for ${conferenceName}`,
         html: `
-            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h2 style="color: #4CAF50;">Dear ${participantInfo.fullName},</h2>
-                <p>Thank you for registering for the <strong>${conferenceName}</strong>!</p>
-                
-                <h3 style="color: #2196F3;">Your Registration Details:</h3>
-                <p><strong>Conference ID:</strong> ${conferenceId}</p>
-                <p><strong>Participant Type:</strong> ${participantInfo.organization || 'N/A'}</p>
-                <p><strong>Selected Items:</strong></p>
-                ${itemsHtml}
-                <p style="font-size: 1.2em; font-weight: bold; color: #E91E63;">Total Amount: $${totalAmount.toFixed(2)}</p>
+            <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333333; background-color: #f7f7f7; padding: 20px;">
+                <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
+                    <h2 style="color: #004466;">Dear ${participantInfo.fullName},</h2>
+                    <p>Thank you for registering for the <strong>${conferenceName}</strong>!</p>
+                    
+                    <h3 style="color: #0077aa; border-bottom: 2px solid #eeeeee; padding-bottom: 10px;">Your Registration Details:</h3>
+                    <p><strong>Conference ID:</strong> ${conferenceId}</p>
+                    <p><strong>Participant Type:</strong> ${participantInfo.organization || 'N/A'}</p>
+                    <p><strong>Selected Items:</strong></p>
+                    ${itemsHtml}
+                    <p style="font-size: 1.2em; font-weight: bold; color: #555555; background-color: #e9ecef; padding: 10px; border-radius: 4px;">Total Amount: $${totalAmount.toFixed(2)}</p>
 
-                <h3 style="color: #2196F3;">Your Contact Information:</h3>
-                <p><strong>Email:</strong> ${participantInfo.email}</p>
-                <p><strong>Country:</strong> ${participantInfo.country}</p>
-                <p><strong>Phone:</strong> ${participantInfo.phone || 'N/A'}</p>
-                
-                <p>We look forward to seeing you at the conference!</p>
-                <p>Best regards,</p>
-                <p>The ${conferenceName} Team</p>
-                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                <p style="font-size: 0.8em; color: #777;">This is an automated email, please do not reply directly to this message.</p>
+                    <h3 style="color: #0077aa; border-bottom: 2px solid #eeeeee; padding-bottom: 10px; margin-top: 20px;">Your Contact Information:</h3>
+                    <p><strong>Email:</strong> ${participantInfo.email}</p>
+                    <p><strong>Country:</strong> ${participantInfo.country}</p>
+                    <p><strong>Phone:</strong> ${participantInfo.phone || 'N/A'}</p>
+                    
+                    <p>We look forward to seeing you at the conference!</p>
+                    <p>Best regards,</p>
+                    <p>The ${conferenceName} Team</p>
+                </div>
+                <hr style="border: none; border-top: 1px solid #dddddd; margin: 20px 0;">
+                <p style="font-size: 0.8em; color: #888888; text-align: center;">This is an automated email, please do not reply directly to this message.</p>
             </div>
         `
     };
