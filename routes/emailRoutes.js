@@ -40,9 +40,9 @@ router.post('/send-registration-email', async (req, res) => {
             <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333333; background-color: #f7f7f7; padding: 20px;">
                 <div style="background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
                     <h2 style="color: #004466;">Dear ${participantInfo.fullName},</h2>
-                    <p>Thank you for registering for the <strong>${conferenceName}</strong>!</p>
+                    <p>Your application submitted for <strong>${conferenceName}</strong>!</p>
                     
-                    <h3 style="color: #0077aa; border-bottom: 2px solid #eeeeee; padding-bottom: 10px;">Your Registration Details:</h3>
+                    <h3 style="color: #0077aa; border-bottom: 2px solid #eeeeee; padding-bottom: 10px;">Application Details:</h3>
                     <p><strong>Conference ID:</strong> ${conferenceId}</p>
                     <p><strong>Participant Type:</strong> ${participantInfo.organization || 'N/A'}</p>
                     <p><strong>Selected Items:</strong></p>
