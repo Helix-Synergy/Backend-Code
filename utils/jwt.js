@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config(); // Ensure dotenv is loaded here for JWT_SECRET
 
 // Function to sign a new JWT
-function signToken(payload, expiresIn = '5m') { // Default to 5 minutes for source tokens
+function signToken(payload, expiresIn = '30d') { // Default to 30 days for source tokens
     if (!process.env.JWT_SECRET) {
         console.error("JWT_SECRET is not defined in .env. Cannot sign token.");
         throw new Error("JWT secret not configured.");

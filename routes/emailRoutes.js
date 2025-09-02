@@ -51,6 +51,7 @@ router.post('/send-registration-email', async (req, res) => {
 
                     <h3 style="color: #0077aa; border-bottom: 2px solid #eeeeee; padding-bottom: 10px; margin-top: 20px;">Your Contact Information:</h3>
                     <p><strong>Email:</strong> ${participantInfo.email}</p>
+                    <p><strong>Address:</strong> ${participantInfo.address}</p>
                     <p><strong>Country:</strong> ${participantInfo.country}</p>
                     <p><strong>Phone:</strong> ${participantInfo.phone || 'N/A'}</p>
                     
