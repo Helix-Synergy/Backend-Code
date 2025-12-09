@@ -869,22 +869,22 @@ const conferencePricingData = {
         { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
       ]
     },
-    {
-      planId: "conference_virtual_2026",
-      name: "Virtual Presentation",
-      basePrice: 599.00,
-      features: [
-        "Online Slot for 20 minutes",
-        "Global Networking",
-        "Promotions",
-        "Certificate of Presentation"
-      ],
-      addOns: [
-        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
-        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
-        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
-      ]
-    },
+    // {
+    //   planId: "conference_virtual_2026",
+    //   name: "Virtual Presentation",
+    //   basePrice: 599.00,
+    //   features: [
+    //     "Online Slot for 20 minutes",
+    //     "Global Networking",
+    //     "Promotions",
+    //     "Certificate of Presentation"
+    //   ],
+    //   addOns: [
+    //     { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+    //     { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+    //     { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+    //   ]
+    // },
     {
       planId: "conference_oral_2026",
       name: "Oral Presentation",
