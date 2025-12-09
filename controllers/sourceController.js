@@ -679,8 +679,298 @@ const conferencePricingData = {
         addOns: []
       }
     ]
-  }
+  },
+"conference": {
+  // "2025": [ // 2025 Prices
+  //   {
+  //     planId: "conference_e_poster_2025",
+  //     name: "E-Poster Presentation",
+  //     basePrice: 139.00,
+  //     features: [
+  //       "Digital e-poster Display",
+  //       "Abstract in Conference Proceedings",
+  //       "Certificate of Presentation"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_poster_2025",
+  //     name: "Poster Presentation",
+  //     basePrice: 239.00,
+  //     features: [
+  //       "Boost your Profile",
+  //       "Networking",
+  //       "Certificate of Presentation"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_video_2025",
+  //     name: "Video Presentation",
+  //     basePrice: 289.00,
+  //     features: [
+  //       "10-15 minutes Video Slot",
+  //       "Online Access for 1 hour",
+  //       "Certificate of Presentation"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_virtual_2025",
+  //     name: "Virtual Presentation",
+  //     basePrice: 389.00,
+  //     features: [
+  //       "Online Slot for 20 minutes",
+  //       "Global Networking",
+  //       "Promotions",
+  //       "Certificate of Presentation"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_oral_2025",
+  //     name: "Oral Presentation",
+  //     basePrice: 889.00,
+  //     features: [
+  //       "Keynote Slot Eligibility",
+  //       "Promotions",
+  //       "Conference Kit",
+  //       "Networking Access"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_delegate_2025",
+  //     name: "Delegate Access",
+  //     basePrice: 329.00,
+  //     features: [
+  //       "Access to all sessions",
+  //       "Conference Handbook",
+  //       "Coffee Break & Lunch",
+  //       "Networking Opportunities"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_suit_a_2025",
+  //     name: "Suit - A (OP + 2N stay)",
+  //     basePrice: 1189.00,
+  //     features: [
+  //       "Oral Presentation",
+  //       "2 Night’s Accommodation",
+  //       "Shuttle Service",
+  //       "Certificate & Promotions",
+  //       "Queen Size Room"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_suit_b_2025",
+  //     name: "Suit - B (OP + 3N stay)",
+  //     basePrice: 1389.00,
+  //     features: [
+  //       "Oral Presentation",
+  //       "3 Night’s Accommodation",
+  //       "Shuttle Service",
+  //       "Certificate & Promotions",
+  //       "Queen Size Room"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_exhibitor_2025",
+  //     name: "Exhibitor Booth",
+  //     basePrice: 2089.00,
+  //     features: [
+  //       "Brand Exposure",
+  //       "Product Showcasing",
+  //       "Partnership Potential",
+  //       "Logo in Conference Proceedings",
+  //       "Promoting Globally"
+  //     ],
+  //     addOns: []
+  //   }
+  // ],
+  "2026": [ // 2026 Prices
+    {
+      planId: "conference_e_poster_2026",
+      name: "E-Poster Presentation",
+      basePrice: 199.00,
+      features: [
+        "Digital e-poster Display",
+        "Abstract in Conference Proceedings",
+        "Certificate of Presentation"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_poster_2026",
+      name: "Poster Presentation",
+      basePrice: 349.00,
+      features: [
+        "Boost your Profile",
+        "Networking",
+        "Certificate of Presentation"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_video_2026",
+      name: "Video Presentation",
+      basePrice: 449.00,
+      features: [
+        "10-15 minutes Video Slot",
+        "Online Access for 1 hour",
+        "Certificate of Presentation"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_virtual_2026",
+      name: "Virtual Presentation",
+      basePrice: 599.00,
+      features: [
+        "Online Slot for 20 minutes",
+        "Global Networking",
+        "Promotions",
+        "Certificate of Presentation"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_oral_2026",
+      name: "Oral Presentation",
+      basePrice: 899.00,
+      features: [
+        "Keynote Slot Eligibility",
+        "Promotions",
+        "Conference Kit",
+        "Networking Access"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_delegate_2026",
+      name: "Delegate Access",
+      basePrice: 349.00,
+      features: [
+        "Access to all sessions",
+        "Conference Handbook",
+        "Coffee Break & Lunch",
+        "Networking Opportunities"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_suit_a_2026",
+      name: "Suit - A (OP + 2N stay)",
+      basePrice: 1199.00,
+      features: [
+        "Oral Presentation",
+        "2 Night’s Accommodation",
+        "Shuttle Service",
+        "Certificate & Promotions",
+        "Queen Size Room"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_suit_b_2026",
+      name: "Suit - B (OP + 3N stay)",
+      basePrice: 1399.00,
+      features: [
+        "Oral Presentation",
+        "3 Night’s Accommodation",
+        "Shuttle Service",
+        "Certificate & Promotions",
+        "Queen Size Room"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_exhibitor_2026",
+      name: "Exhibitor Booth",
+      basePrice: 3999.00,
+      features: [
+        "Brand Exposure",
+        "Product Showcasing",
+        "Partnership Potential",
+        "Logo in Conference Proceedings",
+        "Promoting Globally"
+      ],
+      addOns: []
+    }
+  ]
+}
+
+
 };
+//Conferencce conferences
+
 // --- END Centralized Pricing Data ---
 
 
