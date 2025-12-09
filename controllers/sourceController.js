@@ -728,7 +728,27 @@ const allowedSources = {
     "Antibiotics-2026": { name: "World Congress on Infectious Diseases & Antibiotics", conferenceType: "hybrid" },
     "Cardiology-2026": { name: "International Conference on Cardiology", conferenceType: "hybrid" },
     "Cancer-2026": { name: "Global Summit on Cancer & Research", conferenceType: "hybrid" },
-};
+    
+  "FOODMEET-2026": { name: "Global Summit on Food, Agriculture & Environmental Sciences", conferenceType: "conference" },
+  "MEDICLAVE 2026": { name: "World Medical Conclave", conferenceType: "conference" },
+  "Agriprac-2026": { name: "World Summit on Sustainable Agricultural Practices", conferenceType: "conference" },
+  "Foodomics-2026": { name: "Global Foodomics Conclave", conferenceType: "conference" },
+  "Precision Medicine-2026": { name: "International Conference on Precision Medicine & Personalized Therapies", conferenceType: "conference" },
+  "Public Health-2026": { name: "World Summit Preventive Medicine & Public Health Innovations", conferenceType: "conference" },
+  "BIOCON-2026": { name: "International Conference on Applied Lifesciences", conferenceType: "conference" },
+  "Synthetic Biology - 2026": { name: "World Synthetic Biology & Bioengineering Conclave", conferenceType: "conference" },
+  "Biosol -2026": { name: "Global Colloquium on Biosolutions for Global Challenges", conferenceType: "conference" },
+  "TECHMATICS-2026": { name: "World Science & Technology Summit", conferenceType: "conference" },
+  "Quantum Computing-2026": { name: "International conference on Quantum Computing & Information Science", conferenceType: "conference" },
+  "EAT-2026": { name: "World Summit on Engineering, Energy & Applied Technologies", conferenceType: "conference" },
+  "PHARMTECH-2026": { name: "International Conference on Advanced Pharmaceutical Sciences", conferenceType: "conference" },
+  "Drugs-2026": { name: "Global Conclave on Drug Discovery & Development Innovations", conferenceType: "conference" },
+  "Biosimilars-2026": { name: "World Summit on Biologics, Biosimilars & Biopharmaceuticals", conferenceType: "conference" },
+  "NURSESUMMIT-2026": { name: "World summit on Nursing & Nurse Practices", conferenceType: "conference" },
+  "Critical Care-2026": { name: "International Conference on Critical Care & Emergency Nursing", conferenceType: "conference" },
+  "Nursing Informative-2026": { name: "Global Digital Health, AI & Nursing Informatics Convlave", conferenceType: "conference" }
+}
+
 // --- END Allowed Sources ---
 
 

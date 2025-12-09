@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// Helper function to get price for Stripe (in cents/paise)
+// Helper function to get price for Stdaripe (in cents/paise)
 function getPlanPrice(type, category, planName) {
     console.log(`DEBUG: getPlanPrice called with -> Type: '${type}', Category: '${category}', Plan: '${planName}'`);
     if (!pricing[type] || !pricing[type][category] || !pricing[type][category][planName]) {
