@@ -1036,7 +1036,132 @@ const allowedSources = {
   "Biosimilars-2026": { name: "World Summit on Biologics, Biosimilars & Biopharmaceuticals", conferenceType: "conference" },
   "NURSESUMMIT-2026": { name: "World summit on Nursing & Nurse Practices", conferenceType: "conference" },
   "Critical Care-2026": { name: "International Conference on Critical Care & Emergency Nursing", conferenceType: "conference" },
-  "Nursing Informative-2026": { name: "Global Digital Health, AI & Nursing Informatics Convlave", conferenceType: "conference" }
+  "Nursing Informative-2026": { name: "Global Digital Health, AI & Nursing Informatics Convlave", conferenceType: "conference" },
+  "FOODMEET-2026": {
+    name: "Food, Agriculture & Environmental Sciences Forum",
+    conferenceType: "conference"
+  },
+
+  "MEDICLAVE 2026": {
+    name: "Advanced Medical Practices Conclave",
+    conferenceType: "conference"
+  },
+
+  "BIOCON-2026": {
+    name: "International Conference on Applied Lifesciences",
+    conferenceType: "conference"
+  },
+
+  "QUANTUMTECH-2026": {
+    name: "World Quantam Technology Summit",
+    conferenceType: "conference"
+  },
+
+  "PHARMTECH-2026": {
+    name: "Advanced Pharmaceutical Sciences Forum",
+    conferenceType: "conference"
+  },
+
+  "NURSESUMMIT-2026": {
+    name: "Nursing & Nurse Practices Conclave",
+    conferenceType: "conference"
+  },
+
+  "FOODMICRO-2026": {
+    name: "Food Microbiome Summit",
+    conferenceType: "conference"
+  },
+
+  "AGRIREGEN-2026": {
+    name: "Regenerative AgriTech Forum",
+    conferenceType: "conference"
+  },
+
+  "FOODTECH-2026": {
+    name: "Future FoodTech Expo",
+    conferenceType: "conference"
+  },
+
+  "MILLETS-2026": {
+    name: "Millets & Climate-Resilient Agriculture Summit",
+    conferenceType: "conference"
+  },
+
+  "DIGIPATH-2026": {
+    name: "Digital Pathology & AI Diagnostics Congress",
+    conferenceType: "conference"
+  },
+
+  "PRECISIONMEDICINE-2026": {
+    name: "Precision Medicine Summit",
+    conferenceType: "conference"
+  },
+
+  "AESTHETICA-2026": {
+    name: "Aesthetic Medicine & Cosmetic Innovation Summit",
+    conferenceType: "conference"
+  },
+
+  "SYNBIO-2026": {
+    name: "International Synthetic Biology & Bioengineering Forum",
+    conferenceType: "conference"
+  },
+
+  "MICROBIOME-2026": {
+    name: "Microbiome Therapeutics Summit",
+    conferenceType: "conference"
+  },
+
+  "RAREDISEASE-2026": {
+    name: "International Rare Disease & Orphan Drug Congress",
+    conferenceType: "conference"
+  },
+
+  "ZEROTRUSTAI-2026": {
+    name: "Zero-Trust Security & AI Defense Forum",
+    conferenceType: "conference"
+  },
+
+  "SMARTMATERIALS-2026": {
+    name: "Smart Materials, Nanotech & Advanced Manufacturing Congress",
+    conferenceType: "conference"
+  },
+
+  "MATENERGY-2026": {
+    name: "Advanced Materials & Clean Energy Forum",
+    conferenceType: "conference"
+  },
+
+  "AIDRUG-2026": {
+    name: "AI Drug Discovery Conclave",
+    conferenceType: "conference"
+  },
+
+  "CELLGENE-2026": {
+    name: "Cell & Gene Therapy Manufacturing Summit",
+    conferenceType: "conference"
+  },
+
+  "PHARMACCESS-2026": {
+    name: "Real-World Evidence & Pharma Access Forum",
+    conferenceType: "conference"
+  },
+
+  "AINURSE-2026": {
+    name: "AI & Digital Nursing Forum",
+    conferenceType: "conference"
+  },
+
+  "ER-SUMMIT-2026": {
+    name: "Critical & Emergency Care Summit",
+    conferenceType: "conference"
+  },
+
+  "NURSELEAD-2026": {
+    name: "Nursing Leadership & Workforce Excellence Congress",
+    conferenceType: "conference"
+  }
+  
 }
 
 // --- END Allowed Sources ---
