@@ -33,9 +33,13 @@ function getPlanPrice(type, category, planName) {
  * Creates a Stripe Checkout Session and returns its ID to the frontend.
  */
 const initiatePayment = async (req, res) => {
+
   console.log("Backend: Received request body for initiatePayment:", req.body);
 
   try {
+    // ✅ Get source info from authMiddleware
+const sourceData = req.sourceTokenPayload || {};
+
     const { orderDetails } = req.body;
 
     if (!orderDetails || !Array.isArray(orderDetails) || orderDetails.length === 0) {
