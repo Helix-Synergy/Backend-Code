@@ -99,7 +99,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const ContactModel = require("../models/ContactModel");
+const ContactModel = require("../models/contactmodel");
 
 // Configure multer to handle form data (no file uploads)
 const upload = multer();
