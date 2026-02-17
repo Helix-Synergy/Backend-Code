@@ -22,9 +22,12 @@ function authMiddleware(req, res, next) {
     }
 
     // 3. Fallback: Check for token in query parameter (least secure, use with caution for sensitive operations)
-    if (!token && req.query.token) {
-        token = req.query.token;
-    }
+    // if (!token && req.query.token) {
+    //     token = req.query.token;
+    // }
+    if (req.cookies && req.cookies.sourceToken) {
+    token = req.cookies.sourceToken;
+}
 
     // If no token is found at all
     if (!token) {

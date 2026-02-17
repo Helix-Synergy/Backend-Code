@@ -679,8 +679,298 @@ const conferencePricingData = {
         addOns: []
       }
     ]
-  }
+  },
+"conference": {
+  // "2025": [ // 2025 Prices
+  //   {
+  //     planId: "conference_e_poster_2025",
+  //     name: "E-Poster Presentation",
+  //     basePrice: 139.00,
+  //     features: [
+  //       "Digital e-poster Display",
+  //       "Abstract in Conference Proceedings",
+  //       "Certificate of Presentation"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_poster_2025",
+  //     name: "Poster Presentation",
+  //     basePrice: 239.00,
+  //     features: [
+  //       "Boost your Profile",
+  //       "Networking",
+  //       "Certificate of Presentation"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_video_2025",
+  //     name: "Video Presentation",
+  //     basePrice: 289.00,
+  //     features: [
+  //       "10-15 minutes Video Slot",
+  //       "Online Access for 1 hour",
+  //       "Certificate of Presentation"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_virtual_2025",
+  //     name: "Virtual Presentation",
+  //     basePrice: 389.00,
+  //     features: [
+  //       "Online Slot for 20 minutes",
+  //       "Global Networking",
+  //       "Promotions",
+  //       "Certificate of Presentation"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_oral_2025",
+  //     name: "Oral Presentation",
+  //     basePrice: 889.00,
+  //     features: [
+  //       "Keynote Slot Eligibility",
+  //       "Promotions",
+  //       "Conference Kit",
+  //       "Networking Access"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_delegate_2025",
+  //     name: "Delegate Access",
+  //     basePrice: 329.00,
+  //     features: [
+  //       "Access to all sessions",
+  //       "Conference Handbook",
+  //       "Coffee Break & Lunch",
+  //       "Networking Opportunities"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_suit_a_2025",
+  //     name: "Suit - A (OP + 2N stay)",
+  //     basePrice: 1189.00,
+  //     features: [
+  //       "Oral Presentation",
+  //       "2 Night’s Accommodation",
+  //       "Shuttle Service",
+  //       "Certificate & Promotions",
+  //       "Queen Size Room"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_suit_b_2025",
+  //     name: "Suit - B (OP + 3N stay)",
+  //     basePrice: 1389.00,
+  //     features: [
+  //       "Oral Presentation",
+  //       "3 Night’s Accommodation",
+  //       "Shuttle Service",
+  //       "Certificate & Promotions",
+  //       "Queen Size Room"
+  //     ],
+  //     addOns: [
+  //       { id: "accom_person_2025", name: "Accompanying Person", price: 199.00, perAttendee: true },
+  //       { id: "extra_n_stay_2025", name: "Extra Night Stay", price: 189.00, perAttendee: false },
+  //       { id: "article_pub_2025", name: "Article Publication (Additional)", price: 1089.00, perAttendee: false }
+  //     ]
+  //   },
+  //   {
+  //     planId: "conference_exhibitor_2025",
+  //     name: "Exhibitor Booth",
+  //     basePrice: 2089.00,
+  //     features: [
+  //       "Brand Exposure",
+  //       "Product Showcasing",
+  //       "Partnership Potential",
+  //       "Logo in Conference Proceedings",
+  //       "Promoting Globally"
+  //     ],
+  //     addOns: []
+  //   }
+  // ],
+  "2026": [ // 2026 Prices
+    {
+      planId: "conference_e_poster_2026",
+      name: "E-Poster Presentation",
+      basePrice: 199.00,
+      features: [
+        "Digital e-poster Display",
+        "Abstract in Conference Proceedings",
+        "Certificate of Presentation"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_poster_2026",
+      name: "Poster Presentation",
+      basePrice: 349.00,
+      features: [
+        "Boost your Profile",
+        "Networking",
+        "Certificate of Presentation"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_video_2026",
+      name: "Video Presentation",
+      basePrice: 449.00,
+      features: [
+        "10-15 minutes Video Slot",
+        "Online Access for 1 hour",
+        "Certificate of Presentation"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    // {
+    //   planId: "conference_virtual_2026",
+    //   name: "Virtual Presentation",
+    //   basePrice: 599.00,
+    //   features: [
+    //     "Online Slot for 20 minutes",
+    //     "Global Networking",
+    //     "Promotions",
+    //     "Certificate of Presentation"
+    //   ],
+    //   addOns: [
+    //     { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+    //     { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+    //     { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+    //   ]
+    // },
+    {
+      planId: "conference_oral_2026",
+      name: "Oral Presentation",
+      basePrice: 899.00,
+      features: [
+        "Keynote Slot Eligibility",
+        "Promotions",
+        "Conference Kit",
+        "Networking Access"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_delegate_2026",
+      name: "Delegate Access",
+      basePrice: 349.00,
+      features: [
+        "Access to all sessions",
+        "Conference Handbook",
+        "Coffee Break & Lunch",
+        "Networking Opportunities"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_suit_a_2026",
+      name: "Suit - A (OP + 2N stay)",
+      basePrice: 1199.00,
+      features: [
+        "Oral Presentation",
+        "2 Night’s Accommodation",
+        "Shuttle Service",
+        "Certificate & Promotions",
+        "Queen Size Room"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_suit_b_2026",
+      name: "Suit - B (OP + 3N stay)",
+      basePrice: 1399.00,
+      features: [
+        "Oral Presentation",
+        "3 Night’s Accommodation",
+        "Shuttle Service",
+        "Certificate & Promotions",
+        "Queen Size Room"
+      ],
+      addOns: [
+        { id: "accom_person_2026", name: "Accompanying Person", price: 349.00, perAttendee: true },
+        { id: "extra_n_stay_2026", name: "Extra Night Stay", price: 249.00, perAttendee: false },
+        { id: "article_pub_2026", name: "Article Publication (Additional)", price: 1099.00, perAttendee: false }
+      ]
+    },
+    {
+      planId: "conference_exhibitor_2026",
+      name: "Exhibitor Booth",
+      basePrice: 3999.00,
+      features: [
+        "Brand Exposure",
+        "Product Showcasing",
+        "Partnership Potential",
+        "Logo in Conference Proceedings",
+        "Promoting Globally"
+      ],
+      addOns: []
+    }
+  ]
+}
+
+
 };
+//Conferencce conferences
+
 // --- END Centralized Pricing Data ---
 
 
@@ -728,7 +1018,152 @@ const allowedSources = {
     "Antibiotics-2026": { name: "World Congress on Infectious Diseases & Antibiotics", conferenceType: "hybrid" },
     "Cardiology-2026": { name: "International Conference on Cardiology", conferenceType: "hybrid" },
     "Cancer-2026": { name: "Global Summit on Cancer & Research", conferenceType: "hybrid" },
-};
+    
+  "FOODMEET-2026": { name: "Global Summit on Food, Agriculture & Environmental Sciences", conferenceType: "conference" },
+  "MEDICLAVE 2026": { name: "World Medical Conclave", conferenceType: "conference" },
+  "Agriprac-2026": { name: "World Summit on Sustainable Agricultural Practices", conferenceType: "conference" },
+  "Foodomics-2026": { name: "Global Foodomics Conclave", conferenceType: "conference" },
+  "Precision Medicine-2026": { name: "International Conference on Precision Medicine & Personalized Therapies", conferenceType: "conference" },
+  "Public Health-2026": { name: "World Summit Preventive Medicine & Public Health Innovations", conferenceType: "conference" },
+  "BIOCON-2026": { name: "International Conference on Applied Lifesciences", conferenceType: "conference" },
+  "Synthetic Biology - 2026": { name: "World Synthetic Biology & Bioengineering Conclave", conferenceType: "conference" },
+  "Biosol -2026": { name: "Global Colloquium on Biosolutions for Global Challenges", conferenceType: "conference" },
+  "TECHMATICS-2026": { name: "World Science & Technology Summit", conferenceType: "conference" },
+  "Quantum Computing-2026": { name: "International conference on Quantum Computing & Information Science", conferenceType: "conference" },
+  "EAT-2026": { name: "World Summit on Engineering, Energy & Applied Technologies", conferenceType: "conference" },
+  "PHARMTECH-2026": { name: "International Conference on Advanced Pharmaceutical Sciences", conferenceType: "conference" },
+  "Drugs-2026": { name: "Global Conclave on Drug Discovery & Development Innovations", conferenceType: "conference" },
+  "Biosimilars-2026": { name: "World Summit on Biologics, Biosimilars & Biopharmaceuticals", conferenceType: "conference" },
+  "NURSESUMMIT-2026": { name: "World summit on Nursing & Nurse Practices", conferenceType: "conference" },
+  "Critical Care-2026": { name: "International Conference on Critical Care & Emergency Nursing", conferenceType: "conference" },
+  "Nursing Informative-2026": { name: "Global Digital Health, AI & Nursing Informatics Convlave", conferenceType: "conference" },
+  "FOODMEET-2026": {
+    name: "Food, Agriculture & Environmental Sciences Forum",
+    conferenceType: "conference"
+  },
+
+  "MEDICLAVE 2026": {
+    name: "Advanced Medical Practices Conclave",
+    conferenceType: "conference"
+  },
+
+  "BIOCON-2026": {
+    name: "International Conference on Applied Lifesciences",
+    conferenceType: "conference"
+  },
+
+  "QUANTUMTECH-2026": {
+    name: "World Quantam Technology Summit",
+    conferenceType: "conference"
+  },
+
+  "PHARMTECH-2026": {
+    name: "Advanced Pharmaceutical Sciences Forum",
+    conferenceType: "conference"
+  },
+
+  "NURSESUMMIT-2026": {
+    name: "Nursing & Nurse Practices Conclave",
+    conferenceType: "conference"
+  },
+
+  "FOODMICRO-2026": {
+    name: "Food Microbiome Summit",
+    conferenceType: "conference"
+  },
+
+  "AGRIREGEN-2026": {
+    name: "Regenerative AgriTech Forum",
+    conferenceType: "conference"
+  },
+
+  "FOODTECH-2026": {
+    name: "Future FoodTech Expo",
+    conferenceType: "conference"
+  },
+
+  "MILLETS-2026": {
+    name: "Millets & Climate-Resilient Agriculture Summit",
+    conferenceType: "conference"
+  },
+
+  "DIGIPATH-2026": {
+    name: "Digital Pathology & AI Diagnostics Congress",
+    conferenceType: "conference"
+  },
+
+  "PRECISIONMEDICINE-2026": {
+    name: "Precision Medicine Summit",
+    conferenceType: "conference"
+  },
+
+  "AESTHETICA-2026": {
+    name: "Aesthetic Medicine & Cosmetic Innovation Summit",
+    conferenceType: "conference"
+  },
+
+  "SYNBIO-2026": {
+    name: "International Synthetic Biology & Bioengineering Forum",
+    conferenceType: "conference"
+  },
+
+  "MICROBIOME-2026": {
+    name: "Microbiome Therapeutics Summit",
+    conferenceType: "conference"
+  },
+
+  "RAREDISEASE-2026": {
+    name: "International Rare Disease & Orphan Drug Congress",
+    conferenceType: "conference"
+  },
+
+  "ZEROTRUSTAI-2026": {
+    name: "Zero-Trust Security & AI Defense Forum",
+    conferenceType: "conference"
+  },
+
+  "SMARTMATERIALS-2026": {
+    name: "Smart Materials, Nanotech & Advanced Manufacturing Congress",
+    conferenceType: "conference"
+  },
+
+  "MATENERGY-2026": {
+    name: "Advanced Materials & Clean Energy Forum",
+    conferenceType: "conference"
+  },
+
+  "AIDRUG-2026": {
+    name: "AI Drug Discovery Conclave",
+    conferenceType: "conference"
+  },
+
+  "CELLGENE-2026": {
+    name: "Cell & Gene Therapy Manufacturing Summit",
+    conferenceType: "conference"
+  },
+
+  "PHARMACCESS-2026": {
+    name: "Real-World Evidence & Pharma Access Forum",
+    conferenceType: "conference"
+  },
+
+  "AINURSE-2026": {
+    name: "AI & Digital Nursing Forum",
+    conferenceType: "conference"
+  },
+
+  "ER-SUMMIT-2026": {
+    name: "Critical & Emergency Care Summit",
+    conferenceType: "conference"
+  },
+
+  "NURSELEAD-2026": {
+    name: "Nursing Leadership & Workforce Excellence Congress",
+    conferenceType: "conference"
+  }
+  
+}
+
 // --- END Allowed Sources ---
 
 
