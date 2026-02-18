@@ -283,6 +283,7 @@ const cookieParser = require("cookie-parser");
 const http = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
+const multer = require("multer"); 
 require("dotenv").config();
 
 // Import your existing route files
@@ -379,9 +380,10 @@ app.use("/", contactRoutes);
 app.use("/", brochureRoutes);
 app.use("/api", visitorCountRoutes);
 app.use((err, req, res, next) => {
-
-  // Multer file upload errors
   if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({ message: "File size exceeds 10MB limit" });
+    }
     return res.status(400).json({ message: err.message });
   }
 
@@ -389,7 +391,7 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ message: err.message });
   }
 
-  console.error(err);
+  console.error("Unhandled Error:", err);
   res.status(500).json({ message: "Something went wrong" });
 });
 
