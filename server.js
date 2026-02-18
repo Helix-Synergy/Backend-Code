@@ -378,6 +378,20 @@ app.use("/", abstractRoutes);
 app.use("/", contactRoutes);
 app.use("/", brochureRoutes);
 app.use("/api", visitorCountRoutes);
+app.use((err, req, res, next) => {
+
+  // Multer file upload errors
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ message: err.message });
+  }
+
+  if (err.message === "Only PDF files are allowed") {
+    return res.status(400).json({ message: err.message });
+  }
+
+  console.error(err);
+  res.status(500).json({ message: "Something went wrong" });
+});
 
 // --- Basic Test Route ---
 app.get("/", (req, res) => {
