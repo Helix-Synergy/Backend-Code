@@ -371,15 +371,19 @@ mongoose.connect(process.env.MONGO_URI)
     });
 
 // --- Route Middleware ---
-app.use("/api/payment", paymentRoutes);
+// app.use("/api/payment", paymentRoutes);
 
 // Mount your existing routes
-app.use("/api/source", sourceRoutes);
-app.use("/api", emailRoutes);
+// app.use("/api/source", sourceRoutes);
+// app.use("/api", emailRoutes);
+
+// Helix Subdomain Routes
 app.use("/", abstractRoutes);
 app.use("/", contactRoutes);
 app.use("/", brochureRoutes);
-app.use("/api", visitorCountRoutes);
+// app.use("/api", visitorCountRoutes);
+
+// Helix Conference Contact Form and Email Routes
 app.use("/contact", Router); 
 app.use("/emails",emailRoutes1)
 app.use((err, req, res, next) => {

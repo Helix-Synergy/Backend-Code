@@ -32,17 +32,12 @@ async function PostContactForm(req, res) {
 async function GetContactForm(req, res) {
   try {
     const contacts = await helixmodel.find().sort({ createdAt: -1 }).lean();
+
     return res.status(200).json({
       success: true,
-      data: {
-        id: contacts._id,
-         name:name,
-          email:email,
-          subject:subject,
-          message:message,
-        createdAt: contacts.createdAt,
-      },
+      data: contacts,   // send the array directly
     });
+
   } catch (error) {
     console.error("GetContactForm Error:", error);
     return res.status(500).json({ success: false, message: error.message });
