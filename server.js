@@ -310,6 +310,8 @@ const allowedFrontendOrigins = [
     'http://127.0.0.1:3000',
     'https://helix-scientific-conferences.vercel.app',
     'https://helixconferences.com',
+               
+  'https://www.helixconferences.com', 
    
     
 
@@ -334,7 +336,9 @@ const corsOptions = {
 
     if (
       origin.startsWith("http://localhost") ||
+       origin.startsWith("https://helixconferences.com") ||
       origin.endsWith(".vercel.app") ||
+
       origin.endsWith(".helixconferences.com")
     ) {
       return callback(null, true);
