@@ -1,6 +1,6 @@
 const validator = require("validator");
 
-module.exports = function validateContact(req, res, next) {
+async function validateContact(req, res, next) {
   let { name, email, subject, message } = req.body;
 
   if (
@@ -30,7 +30,7 @@ module.exports = function validateContact(req, res, next) {
 
   next();
 };
-module.exports =  function validateEmail(req,res,next){
+async  function validateEmail(req,res,next){
     let {email}=req.body;
     if(!email || !email.trim()){
         return res.status(400).json({success:false,message:"Email is required"})
@@ -46,3 +46,4 @@ module.exports =  function validateEmail(req,res,next){
     }
     next();
 }
+module.exports = { validateContact, validateEmail };
