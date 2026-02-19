@@ -18,10 +18,11 @@ return res.status(201).json({success:true,message:"Email saved successfully",id:
 }
 async function GetEmail(req,res){
     try{
-return res.json({messaage:"done"})
+const emails=await helixEmailModel.find().sort({createdAt:-1}).lean();
+return res.status(200).json({success:true,count:emails.length,emails:emails.map(e=>({id:e._id,email:e.email,createdAt:e.createdAt}))})
     }
     catch(error){
-
+return res.status(500).json({success:false,message:error.message});
     }
 }
 module.exports={PostEmail,GetEmail}
