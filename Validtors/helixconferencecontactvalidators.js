@@ -1,6 +1,6 @@
 const validator = require("validator");
 
-async function validateContact(req, res, next) {
+ function validateContact(req, res, next) {
   let { name, email, subject, message } = req.body;
 
   if (
@@ -30,7 +30,7 @@ async function validateContact(req, res, next) {
 
   next();
 };
-async  function validateEmail(req,res,next){
+  function validateEmail(req,res,next){
     let {email}=req.body;
     if(!email || !email.trim()){
         return res.status(400).json({success:false,message:"Email is required"})
