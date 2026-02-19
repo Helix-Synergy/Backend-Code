@@ -293,7 +293,8 @@ const abstractRoutes = require("./routes/abstractRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const brochureRoutes = require("./routes/brochureRoutes");
 const visitorCountRoutes = require("./routes/visitorCountRoutes");
-
+const Router=require("./routes/helixconferencecontactroute")
+const emailRoutes1=require("./routes/helixconferenceEmailrouter")
 // This paymentRoutes file will now be for Stripe only
 const paymentRoutes = require("./routes/paymentRoutes");
 
@@ -379,6 +380,8 @@ app.use("/", abstractRoutes);
 app.use("/", contactRoutes);
 app.use("/", brochureRoutes);
 app.use("/api", visitorCountRoutes);
+app.use("/contact", Router); 
+app.use("/emails",emailRoutes1)
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {

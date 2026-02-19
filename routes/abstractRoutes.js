@@ -192,10 +192,10 @@ router.post("/abstract-submission", upload.single("abstract"), async (req, res) 
 router.get("/abstracts", async (req, res) => {
   try {
     const abstracts = await Abstract.find().sort({ createdAt: -1 });
-    res.json(abstracts);
+    res.status(200).json(abstracts);
   } catch (error) {
     console.error("Fetch Error:", error);
-    res.status(500).json({ message: "Failed to fetch abstracts" });
+  return  res.status(500).json({ message: "Failed to fetch abstracts" });
   }
 });
 
@@ -210,7 +210,7 @@ router.get("/abstracts/domain/:domain", async (req, res) => {
       createdAt: -1,
     });
 
-    res.json(abstracts);
+   return res.status(200).json(abstracts);
   } catch (error) {
     console.error("Domain Fetch Error:", error);
     res.status(500).json({ message: "Failed to fetch domain abstracts" });
