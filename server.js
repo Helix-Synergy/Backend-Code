@@ -295,6 +295,7 @@ const brochureRoutes = require("./routes/brochureRoutes");
 const visitorCountRoutes = require("./routes/visitorCountRoutes");
 const Router=require("./routes/helixconferencecontactroute")
 const emailRoutes1=require("./routes/helixconferenceEmailrouter")
+const router2=require("./routes/helixsyngeryrouter")
 // This paymentRoutes file will now be for Stripe only
 const paymentRoutes = require("./routes/paymentRoutes");
 
@@ -390,6 +391,8 @@ app.use("/", brochureRoutes);
 // Helix Conference Contact Form and Email Routes
 app.use("/contact", Router); 
 app.use("/emails",emailRoutes1)
+// Helix syngery crop contact form routes
+app.use('/contactform',router2)
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {

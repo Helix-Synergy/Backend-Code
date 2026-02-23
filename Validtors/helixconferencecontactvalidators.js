@@ -46,4 +46,22 @@ const validator = require("validator");
     }
     next();
 }
-module.exports = { validateContact, validateEmail };
+function validateHelixSyngery(req,res,next){
+    let {name,email,message}=req.body;
+    if(!name || !email || !message || !name.trim() || !message.trim()){
+        return res.status(400).json({success:false,message:"All fields are required"})
+    }
+    if(!validator.isEmail(email)){
+        return res.status(400).json({success:false,message:"Invalid email format"})
+    }
+    if(name.length>50 || message.length>1000){
+        return res.status(400).json({success:false,message:"Input length exceeded"})
+    }
+    req.body={
+        name:validator.escape(name.trim()),
+        email:validator.normalizeEmail(email.trim()),
+        message:validator.escape(message.trim())
+    }
+    next();
+}
+module.exports = { validateContact, validateEmail,validateHelixSyngery };
