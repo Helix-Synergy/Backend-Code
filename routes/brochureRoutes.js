@@ -326,7 +326,8 @@ const router = express.Router();
 const nodemailer = require('nodemailer');
 const path = require('path');
 const multer = require('multer');
-const fs = require('fs'); // <--- ADDED: Import the fs module
+const fs = require('fs');
+const BrochureDownload = require('../models/BrochureDownload');
 
 // Configure multer to handle form data without file uploads
 const upload = multer();
@@ -427,22 +428,25 @@ router.post("/brochure-download", upload.none(), async (req, res) => {
     console.log(`DEBUG: websiteDomain received: "${websiteDomain}"`);
     console.log(`DEBUG: Initial brochureFilePath from map: "${brochureFilePath}"`);
 
-    // Resolve the absolute path to be absolutely sure
-    const absoluteBrochurePath = path.resolve(brochureFilePath);
-    console.log(`DEBUG: Absolute brochure path resolved: "${absoluteBrochurePath}"`);
-    console.log(`DEBUG: Checking if file exists at: "${absoluteBrochurePath}"`);
-    const fileExists = fs.existsSync(absoluteBrochurePath);
-    console.log(`DEBUG: fs.existsSync result: ${fileExists}`);
-    // **** END OF DEBUGGING LOGS ****
-  
-  // Check if the specific brochure file exists, otherwise use fallback
-  if (!brochureFilePath || !fileExists) { // Changed to use fileExists variable
-    console.warn(`Brochure not found for domain: ${websiteDomain}. Using fallback brochure.`);
-    brochureFilePath = FALLBACK_BROCHURE_PATH;
-  }
-  
-  const brochureFilename = path.basename(brochureFilePath); // Get just the filename from the path
-    console.log(`DEBUG: Final brochureFilename to be attached: "${brochureFilename}"`); // <--- ADDED: Final filename check
+    // Check if the specific brochure file exists, otherwise use fallback
+    let absoluteBrochurePath;
+    let fileExists = false;
+    
+    if (brochureFilePath) {
+      absoluteBrochurePath = path.resolve(brochureFilePath);
+      console.log(`DEBUG: Absolute brochure path resolved: "${absoluteBrochurePath}"`);
+      console.log(`DEBUG: Checking if file exists at: "${absoluteBrochurePath}"`);
+      fileExists = fs.existsSync(absoluteBrochurePath);
+      console.log(`DEBUG: fs.existsSync result: ${fileExists}`);
+    }
+
+    if (!brochureFilePath || !fileExists) {
+      console.warn(`Brochure not found for domain: ${websiteDomain}. Using fallback brochure.`);
+      brochureFilePath = FALLBACK_BROCHURE_PATH;
+    }
+  
+    const brochureFilename = path.basename(brochureFilePath);
+    console.log(`DEBUG: Final brochureFilename to be attached: "${brochureFilename}"`);
 
   // --- Send Email to Administrator (Internal Notification) ---
   const adminMailOptions = {
@@ -497,22 +501,52 @@ router.post("/brochure-download", upload.none(), async (req, res) => {
     ],
   };
 
-  try {
-    await infoTransporter.sendMail(adminMailOptions);
-    console.log("Admin notification email sent for brochure download.");
+  try {
+    // Save to Database first
+    const newSubmission = await BrochureDownload.create({
+      firstName, lastName, mobileNumber, address, state, country,
+      university, email, affiliation, linkedin, twitter, interestedIn, websiteDomain
+    });
+    console.log("Brochure download saved to DB:", newSubmission._id);
 
-    await infoTransporter.sendMail(userMailOptions);
-    console.log("Brochure download confirmation email sent to user with dynamic attachment.");
+    try {
+      await infoTransporter.sendMail(adminMailOptions);
+      console.log("Admin notification email sent for brochure download.");
 
-    res.status(200).send("Form submitted and brochure sent to your email!");
+      await infoTransporter.sendMail(userMailOptions);
+      console.log("Brochure download confirmation email sent to user with dynamic attachment.");
+    } catch (emailError) {
+      console.error("Warning: Emails failed to send, but data was saved:", emailError.message);
+    }
 
-  } catch (error) {
-    console.error("Error processing brochure download:", error);
-    if (error.code === 'EENVELOPE' || error.code === 'EAUTH' || error.code === 'ETIMEDOUT') {
-      return res.status(500).send("Error sending email. Please check server logs for details.");
-    }
-    res.status(500).send("Failed to process brochure download. Please try again.");
-  }
+    res.status(200).json({ success: true, message: "Form submitted and brochure sent to your email!" });
+
+  } catch (error) {
+    console.error("Error processing brochure download:", error);
+    if (error.code === 'EENVELOPE' || error.code === 'EAUTH' || error.code === 'ETIMEDOUT') {
+      return res.status(500).send("Error sending email. Please check server logs for details.");
+    }
+    res.status(500).send("Failed to process brochure download. Please try again.");
+  }
+});
+
+// --- API Route to Fetch Brochure Downloads for Admin Dashboard ---
+router.get("/brochure-download/:domain", async (req, res) => {
+  try {
+    const { domain } = req.params;
+    let query = { websiteDomain: domain };
+    
+    // If domain is "all", fetch all records (optional convenience)
+    if (domain === "all") {
+      query = {};
+    }
+
+    const submissions = await BrochureDownload.find(query).sort({ createdAt: -1 });
+    res.status(200).json(submissions);
+  } catch (error) {
+    console.error("Error fetching brochure downloads:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch brochure downloads." });
+  }
 });
 
 module.exports = router;
