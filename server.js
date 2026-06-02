@@ -14,11 +14,10 @@ const abstractRoutes = require("./routes/abstractRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const brochureRoutes = require("./routes/brochureRoutes");
 const visitorCountRoutes = require("./routes/visitorCountRoutes");
-
 const Router = require("./routes/helixconferencecontactroute");
 const emailRoutes1 = require("./routes/helixconferenceEmailrouter");
 const router2 = require("./routes/helixsyngeryrouter");
-
+const chatbotRoutes = require("./routes/chatbotRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
@@ -182,6 +181,9 @@ app.use("/emails", emailRoutes1);
 
 // Helix Synergy Routes
 app.use("/contactform", router2);
+
+// Chatbot Routes
+app.use('/api/chatbot', chatbotRoutes);
 
 
 // =========================

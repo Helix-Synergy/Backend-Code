@@ -21,6 +21,7 @@
   "author": "Your Name/Team",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@paypal/checkout-server-sdk": "^1.0.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
