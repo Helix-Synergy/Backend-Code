@@ -137,3 +137,13 @@ exports.saveUser = async (req, res) => {
   }
 };
 
+exports.getUsers = async (req, res) => {
+  try {
+    const users = await ChatbotUser.find().sort({ createdAt: -1 });
+    res.status(200).json({ data: users });
+  } catch (error) {
+    console.error("Fetch Users Error:", error);
+    res.status(500).json({ error: "Failed to fetch chatbot users." });
+  }
+};
+
