@@ -3,9 +3,16 @@ const ChatbotFaq = require('../models/chatbotFaqModel');
 const ChatLog = require('../models/chatbotLogModel');
 const ChatbotUser = require('../models/chatbotUserModel');
 const NodeCache = require("node-cache");
+const { Resend } = require('resend');
 
 // Initialize cache with a Time-To-Live of 24 hours (86400 seconds)
 const aiCache = new NodeCache({ stdTTL: 86400 });
+
+// Initialize OTP cache with a TTL of 5 minutes (300 seconds)
+const otpCache = new NodeCache({ stdTTL: 300 });
+
+// Initialize Resend
+const resendClient = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Initialize Google Generative AI conditionally
 let genAI;
@@ -164,6 +171,66 @@ exports.saveUser = async (req, res) => {
   } catch (error) {
     console.error("Save User Error:", error);
     res.status(500).json({ error: "Failed to save user details." });
+  }
+};
+
+exports.sendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required." });
+
+    if (!resendClient) {
+      console.error("Resend API key missing");
+      return res.status(500).json({ error: "Email service is not configured." });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpCache.set(email, otp);
+
+    const { data, error } = await resendClient.emails.send({
+        from: 'Helix Conferences <info@helixconferences.com>',
+        to: [email],
+        subject: `Your Chatbot Verification Code`,
+        html: `
+            <div style="font-family: sans-serif; padding: 20px;">
+                <h2 style="color: #004466;">Welcome to Helix Conferences!</h2>
+                <p>Your verification code to start chatting is: <strong style="font-size: 24px; color: #0077aa;">${otp}</strong></p>
+                <p>This code will expire in 5 minutes.</p>
+            </div>
+        `
+    });
+
+    if (error) {
+      console.error("Resend API Error:", error);
+      return res.status(500).json({ error: "Failed to send OTP email via Resend." });
+    }
+
+    res.status(200).json({ message: "OTP sent successfully." });
+  } catch (error) {
+    console.error("Send OTP Error:", error);
+    res.status(500).json({ error: "Failed to send OTP email." });
+  }
+};
+
+exports.verifyOtpAndSaveUser = async (req, res) => {
+  try {
+    const { name, email, phone, otp } = req.body;
+    if (!name || !email || !phone || !otp) {
+      return res.status(400).json({ error: "All fields and OTP are required." });
+    }
+
+    const cachedOtp = otpCache.get(email);
+    if (!cachedOtp || cachedOtp !== otp) {
+      return res.status(400).json({ error: "Invalid or expired verification code." });
+    }
+
+    otpCache.del(email); // OTP is valid, remove it from cache
+
+    const newUser = await ChatbotUser.create({ name, email, phone });
+    res.status(201).json({ message: "User verified and saved successfully.", user: newUser });
+  } catch (error) {
+    console.error("Verify OTP Error:", error);
+    res.status(500).json({ error: "Failed to verify user." });
   }
 };
 

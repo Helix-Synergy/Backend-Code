@@ -13,7 +13,9 @@ const chatbotLimiter = rateLimit({
 });
 
 router.post('/', chatbotLimiter, chatbotController.handleChat);
-router.post('/user', chatbotController.saveUser);
+router.post('/user', chatbotController.saveUser); // Kept for backwards compatibility
+router.post('/send-otp', chatbotController.sendOtp);
+router.post('/verify-otp', chatbotController.verifyOtpAndSaveUser);
 router.get('/users', chatbotController.getUsers);
 
 module.exports = router;
