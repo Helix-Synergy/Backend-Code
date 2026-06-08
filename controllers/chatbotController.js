@@ -2,6 +2,10 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const ChatbotFaq = require('../models/chatbotFaqModel');
 const ChatLog = require('../models/chatbotLogModel');
 const ChatbotUser = require('../models/chatbotUserModel');
+const NodeCache = require("node-cache");
+
+// Initialize cache with a Time-To-Live of 24 hours (86400 seconds)
+const aiCache = new NodeCache({ stdTTL: 86400 });
 
 // Initialize Google Generative AI conditionally
 let genAI;
@@ -37,6 +41,12 @@ const staticFaqs = [
     response: "You can view ticket pricing and details on our Registration page.",
     buttonText: "View Tickets",
     link: "/buy-a-ticket"
+  },
+  {
+    keywords: ["upcoming conferences", "upcoming", "conferences", "events"],
+    response: "You can explore all our upcoming conferences on the Conferences page.",
+    buttonText: "View Conferences",
+    link: "https://helixconferences.com/Conferences"
   }
 ];
 
@@ -102,6 +112,16 @@ ${conferencesList}
 
 Be helpful, engaging, and professional.`;
 
+    // 3. Check Cache before calling Gemini API
+    const cacheKey = `gemini_${lowerMessage}`;
+    const cachedResponse = aiCache.get(cacheKey);
+    
+    if (cachedResponse) {
+      console.log("Serving chatbot response from cache.");
+      await ChatLog.create({ userMessage: message, botResponse: cachedResponse });
+      return res.json({ response: cachedResponse });
+    }
+
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash",
       systemInstruction: systemPrompt 
@@ -109,6 +129,9 @@ Be helpful, engaging, and professional.`;
 
     const result = await model.generateContent(message);
     const aiResponse = result.response.text();
+
+    // Save response to cache
+    aiCache.set(cacheKey, aiResponse);
 
     // Log interaction
     await ChatLog.create({ userMessage: message, botResponse: aiResponse });
@@ -119,6 +142,13 @@ Be helpful, engaging, and professional.`;
 
   } catch (error) {
     console.error("Chatbot Error:", error);
+    
+    // Graceful fallback for 503 Service Unavailable from Gemini API
+    if (error.status === 503 || (error.message && error.message.includes('503'))) {
+      const fallbackResponse = "The AI service is currently experiencing high demand. I can still help you with registration, abstract submission, pricing, or contacting us.";
+      return res.json({ response: fallbackResponse });
+    }
+    
     res.status(500).json({ error: "Something went wrong. Please try again later." });
   }
 };

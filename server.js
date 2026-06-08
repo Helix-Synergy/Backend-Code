@@ -6,6 +6,7 @@ const { Server } = require("socket.io");
 const mongoose = require("mongoose");
 const multer = require("multer");
 require("dotenv").config();
+// Database configuration migrated to Mongoose models
 
 // Routes
 const sourceRoutes = require("./routes/sourceRoutes");
@@ -21,6 +22,7 @@ const chatbotRoutes = require("./routes/chatbotRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy for accurate rate limiting IP detection
 
 const PORT = process.env.PORT || 5000;
 
@@ -152,6 +154,8 @@ mongoose
     console.log("❌ MongoDB connection error:", err);
     process.exit(1);
   });
+
+// SQLite initialization has been removed. Visitor counting now relies solely on MongoDB.
 
 
 // =========================
