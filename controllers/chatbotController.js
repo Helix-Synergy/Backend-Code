@@ -54,6 +54,18 @@ const staticFaqs = [
     response: "You can explore all our upcoming conferences on the Conferences page.",
     buttonText: "View Conferences",
     link: "https://helixconferences.com/Conferences"
+  },
+  {
+    keywords: ["brochure", "download", "download brochure"],
+    response: "You can download the conference brochure directly from the specific conference's page."
+  },
+  {
+    keywords: ["travel", "accommodation", "visa", "hotel", "stay"],
+    response: "Visa documents will be supported, a complimentary accommodation will be provided for oral presenters."
+  },
+  {
+    keywords: ["discount", "discounts", "offer", "concession", "pricing discount"],
+    response: "For discounts on pricing, please contact us at +1-7036-516-096 or email us at hello@helixconferences.com."
   }
 ];
 
@@ -103,7 +115,7 @@ exports.handleChat = async (req, res) => {
     try {
       const confPath = path.join(__dirname, '..', 'conferences.txt');
       if (fs.existsSync(confPath)) {
-        conferencesList = fs.readFileSync(confPath, 'utf8');
+        conferencesList = await fs.promises.readFile(confPath, 'utf8');
       }
     } catch (e) {
       console.error("Could not load conferences list:", e);
