@@ -1,0 +1,34 @@
+name: Deploy Helix Backend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "Starting deployment..."
+
+            cd /home/ubuntu/Backend-Code
+
+            git pull origin main
+
+            npm install
+
+            pm2 restart helix-conferences-backend --update-env
+
+            pm2 save
+
+            echo "Deployment completed successfully!"
