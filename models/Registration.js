@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const registrationSchema = new mongoose.Schema({
     firstName: { type: String, trim: true, required: true },
     lastName: { type: String, trim: true, required: true },
-    email: { type: String, required: true, unique: true, trim: true, lowercase: true },
+    email: { type: String, required: true, trim: true, lowercase: true },
     mobileNumber: { type: String, trim: true },
     address: { type: String, trim: true },
     state: { type: String, trim: true },

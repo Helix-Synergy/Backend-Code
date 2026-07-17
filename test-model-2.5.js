@@ -1,18 +1,25 @@
 require('dotenv').config();
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const Bytez = require('bytez.js');
 
 async function testModel() {
   try {
+    const bytezClient = new Bytez(process.env.BYTEZ_API_KEY);
+    const model = bytezClient.model("mistralai/Mistral-7B-Instruct-v0.2");
+    
     const systemPrompt = "You are a helpful assistant.";
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
-      systemInstruction: systemPrompt
-    });
-    const result = await model.generateContent("hello");
-    console.log("gemini-2.5-flash success with system instruction!", result.response.text());
+    const input = [
+      { "role": "system", "content": systemPrompt },
+      { "role": "user", "content": "hello" }
+    ];
+
+    const { error, output } = await model.run(input);
+    if (error) {
+      console.error("mistralai/Mistral-7B-Instruct-v0.2 failed with system instruction:", error);
+    } else {
+      console.log("mistralai/Mistral-7B-Instruct-v0.2 success with system instruction!", output);
+    }
   } catch (e) {
-    console.error("gemini-2.5-flash failed with system instruction:", e);
+    console.error("Test failed:", e);
   }
 }
 testModel();

@@ -1,111 +1,135 @@
-// Backend for Helix/controllers/paymentController.js (Stripe Only)
 const nodemailer = require("nodemailer");
 const Registration = require("../models/Registration");
 const pricing = require('../models/Pricing');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Stripe SDK
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+const { generateReceipt } = require('../utils/pdfGenerator');
 
 // --- Initialize Nodemailer Transporter ONCE ---
 const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT),
-    secure: process.env.EMAIL_SECURE === 'true',
+    host: 'smtp.resend.com',
+    port: 465,
+    secure: true,
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: 'resend',
+        pass: process.env.RESEND_API_KEY,
     },
 });
 
-// Helper function to get price for Stdaripe (in cents/paise)
-function getPlanPrice(type, category, planName) {
-    console.log(`DEBUG: getPlanPrice called with -> Type: '${type}', Category: '${category}', Plan: '${planName}'`);
-    if (!pricing[type] || !pricing[type][category] || !pricing[type][category][planName]) {
-        console.warn(`DEBUG: pricing['${type}']['${category}']['${planName}'] does NOT exist.`);
-        return null;
-    }
-    // Stripe expects amount in the smallest currency unit
-    const price = Math.round(parseFloat(pricing[type][category][planName]) * 100);
-    console.log(`DEBUG: Found price: ${price} (in smallest unit).`);
-    return price;
-}
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 /**
  * initiatePayment:
- * Creates a Stripe Checkout Session and returns its ID to the frontend.
+ * Creates a Razorpay order and returns its details to the frontend.
  */
 const initiatePayment = async (req, res) => {
+    console.log("Backend: Received request body for initiatePayment:", req.body);
 
-  console.log("Backend: Received request body for initiatePayment:", req.body);
+    try {
+        const sourceData = req.sourceTokenPayload || {};
+        const { orderDetails, participantInfo, conferenceId, conferenceName, totalAmount } = req.body;
 
-  try {
-    // ✅ Get source info from authMiddleware
-const sourceData = req.sourceTokenPayload || {};
+        if (!orderDetails || !Array.isArray(orderDetails) || orderDetails.length === 0) {
+            return res.status(400).json({ message: "Invalid order details" });
+        }
 
-    const { orderDetails } = req.body;
+        // Determine sourceSite from payload or use a default if bypass/direct
+        const sourceSiteId = sourceData.sourceId || conferenceId || 'unknown_source';
 
-    if (!orderDetails || !Array.isArray(orderDetails) || orderDetails.length === 0) {
-      return res.status(400).json({ message: "Invalid order details" });
+        // Calculate total amount in smallest currency unit (paise for INR, cents for USD)
+        // Note: You can switch to INR if required by Razorpay account config
+        const amount = Math.round(totalAmount * 100); 
+        const currency = "USD"; // USD transactions do not support UPI/QR in Razorpay
+
+        // Create initial registration record
+        const newRegistration = new Registration({
+            firstName: participantInfo.fullName.split(' ')[0] || '',
+            lastName: participantInfo.fullName.split(' ').slice(1).join(' ') || '',
+            email: participantInfo.email,
+            mobileNumber: participantInfo.mobileNum,
+            address: participantInfo.billingAddress,
+            city: participantInfo.city,
+            country: participantInfo.country,
+            university: participantInfo.university,
+            affiliation: participantInfo.affiliation,
+            plan: orderDetails[0].name,
+            type: "hybrid", // Defaulting as placeholder, adapt if provided in body
+            category: "academic", // Defaulting as placeholder
+            sourceSite: sourceSiteId,
+            status: "pending_payment",
+            registrationDate: new Date(),
+        });
+
+        await newRegistration.save();
+
+        const options = {
+            amount: amount,
+            currency: currency,
+            receipt: newRegistration._id.toString(),
+            payment_capture: 1 // Auto capture
+        };
+
+        const order = await razorpay.orders.create(options);
+
+        // Save razorpay order ID and amount to registration for receipt generation later
+        newRegistration.paymentDetails = { 
+            razorpayOrderId: order.id,
+            amountTotal: totalAmount, // Save totalAmount for receipt
+            currency: currency
+        };
+        await newRegistration.save();
+
+        res.status(200).json({ 
+            orderId: order.id, 
+            amount: amount, 
+            currency: currency,
+            registrationId: newRegistration._id 
+        });
+
+    } catch (error) {
+        console.error("❌ Razorpay payment initiation failed:", error);
+        res.status(500).json({ message: "Failed to initiate payment", error: error.message });
     }
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: orderDetails.map(item => ({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: item.name,
-            description: item.description || "Conference registration item"
-          },
-          unit_amount: Math.round(item.price * 100), // Stripe expects cents
-        },
-        quantity: item.quantity,
-      })),
-      mode: 'payment',
-      success_url: `${process.env.FRONTEND_URL}/stripe-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/stripe-cancel`,
-    });
-
-    res.status(200).json({ sessionId: session.id });
-
-  } catch (error) {
-    console.error("❌ Stripe payment initiation failed:", error);
-    res.status(500).json({ message: "Failed to initiate payment", error: error.message });
-  }
 };
 
-
 /**
- * confirmPayment:
- * This is the Stripe Webhook listener.
+ * verifyPayment:
+ * Verifies the Razorpay signature sent by the frontend after successful checkout.
  */
-const confirmPayment = async (req, res) => {
-    const sig = req.headers['stripe-signature'];
-    const rawBody = req.body;
-
-    let event;
+const verifyPayment = async (req, res) => {
     try {
-        event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
-    } catch (err) {
-        console.error(`❌ Stripe Webhook signature verification failed:`, err.message);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature, registrationId } = req.body;
 
-    if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
-        console.log('✅ Stripe checkout session completed!', session.id);
+        const generatedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(razorpay_order_id + "|" + razorpay_payment_id)
+            .digest('hex');
 
-        const registrationId = session.client_reference_id;
+        if (generatedSignature !== razorpay_signature) {
+            console.error("❌ Invalid Razorpay signature");
+            return res.status(400).json({ message: "Invalid payment signature" });
+        }
+
+        let paymentMethod = 'Unknown';
+        try {
+            const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
+            paymentMethod = paymentDetails.method; // "upi", "card", "netbanking", etc.
+        } catch (err) {
+            console.error("❌ Failed to fetch payment method from Razorpay:", err);
+        }
+
         const registration = await Registration.findOneAndUpdate(
             { _id: registrationId, status: 'pending_payment' },
             {
                 $set: {
                     status: "paid",
-                    paymentDetails: {
-                        paymentGateway: "Stripe",
-                        stripeSessionId: session.id,
-                        amountTotal: session.amount_total / 100,
-                        currency: session.currency,
-                        paymentIntentId: session.payment_intent,
-                    },
+                    "paymentDetails.paymentGateway": "Razorpay",
+                    "paymentDetails.method": paymentMethod,
+                    "paymentDetails.razorpayOrderId": razorpay_order_id,
+                    "paymentDetails.razorpayPaymentId": razorpay_payment_id,
+                    "paymentDetails.razorpaySignature": razorpay_signature,
                     paymentDate: new Date(),
                 },
             },
@@ -113,27 +137,57 @@ const confirmPayment = async (req, res) => {
         );
 
         if (!registration) {
-            console.error(`❌ Registration not found or already processed for Stripe Session ID: ${session.id}`);
-            return res.status(200).send("Registration not found or already processed.");
+            console.error(`❌ Registration not found or already processed for Order ID: ${razorpay_order_id}`);
+            return res.status(400).json({ message: "Registration not found or already processed." });
         }
 
         // --- Send Post-Payment Email to Admin ---
         try {
             await transporter.sendMail({
-                from: `"Helix Conferences" <${process.env.EMAIL_USER}>`,
+                from: `"Helix Conferences" <${process.env.ADMIN_EMAIL}>`,
                 to: process.env.ADMIN_EMAIL,
-                subject: `🚀 Stripe Payment Confirmed: ${registration.firstName} ${registration.lastName}`,
+                subject: `🚀 Razorpay Payment Confirmed: ${registration.firstName} ${registration.lastName}`,
                 html: `
-                    <h2>Stripe Payment Confirmed! New Registration Completed!</h2>
+                    <h2>Razorpay Payment Confirmed! New Registration Completed!</h2>
                     <p><strong>Name:</strong> ${registration.firstName} ${registration.lastName}</p>
                     <p><strong>Email:</strong> ${registration.email}</p>
-                    <p><strong>Amount Paid:</strong> ${session.amount_total / 100} ${session.currency.toUpperCase()}</p>
                     <p><strong>Registration ID:</strong> ${registration._id}</p>
+                    <p><strong>Razorpay Payment ID:</strong> ${razorpay_payment_id}</p>
                 `,
             });
-            console.log(`Post-payment confirmation email sent to admin for ${registration.email} via Stripe.`);
+            console.log(`Post-payment confirmation email sent to admin for ${registration.email} via Razorpay.`);
         } catch (emailError) {
-            console.error("❌ Error sending post-payment confirmation email:", emailError);
+            console.error("❌ Error sending post-payment confirmation email to admin:", emailError);
+        }
+
+        // --- Generate PDF Receipt and Email to Participant ---
+        try {
+            const pdfBuffer = await generateReceipt(registration);
+            
+            await transporter.sendMail({
+                from: `"Helix Conferences" <${process.env.ADMIN_EMAIL}>`,
+                to: registration.email,
+                subject: `Payment Receipt - Helix Conferences`,
+                html: `
+                    <h2>Thank you for your registration!</h2>
+                    <p>Dear ${registration.firstName},</p>
+                    <p>Your payment for <strong>${registration.plan}</strong> has been successfully processed.</p>
+                    <p>Please find attached your payment receipt.</p>
+                    <br>
+                    <p>Best Regards,</p>
+                    <p>Helix Conferences Team</p>
+                `,
+                attachments: [
+                    {
+                        filename: `Receipt_${registration._id}.pdf`,
+                        content: pdfBuffer,
+                        contentType: 'application/pdf'
+                    }
+                ]
+            });
+            console.log(`Receipt email sent to participant ${registration.email}.`);
+        } catch (emailError) {
+            console.error("❌ Error sending receipt email to participant:", emailError);
         }
 
         // --- Emit WebSocket Broadcast for Real-time Updates ---
@@ -146,343 +200,48 @@ const confirmPayment = async (req, res) => {
                 sourceSite: registration.sourceSite,
                 timestamp: new Date().toISOString(),
             });
-            console.log(`✅ Emitted Socket.IO event 'new_registration' for ${registration.email} (Stripe)`);
+            console.log(`✅ Emitted Socket.IO event 'new_registration' for ${registration.email} (Razorpay)`);
         }
 
-    } else {
-        console.log(`Received Stripe webhook event type: ${event.type}. Not processing.`);
+        res.status(200).json({ success: true, message: "Payment verified successfully" });
+    } catch (error) {
+        console.error("❌ Error verifying payment:", error);
+        res.status(500).json({ message: "Payment verification failed", error: error.message });
     }
+};
 
-    res.status(200).json({ received: true });
+/**
+ * downloadReceipt:
+ * Generates and streams the PDF receipt on demand for a given registration.
+ */
+const downloadReceipt = async (req, res) => {
+    try {
+        const { registrationId } = req.params;
+        const registration = await Registration.findById(registrationId);
+        
+        if (!registration) {
+            return res.status(404).json({ message: "Registration not found" });
+        }
+        
+        if (registration.status !== 'paid') {
+            return res.status(400).json({ message: "Cannot generate receipt for unpaid registration" });
+        }
+
+        const pdfBuffer = await generateReceipt(registration);
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=Receipt_${registrationId}.pdf`);
+        res.setHeader('Content-Length', pdfBuffer.length);
+        
+        res.status(200).end(pdfBuffer);
+    } catch (error) {
+        console.error("❌ Error downloading receipt:", error);
+        res.status(500).json({ message: "Failed to download receipt", error: error.message });
+    }
 };
 
 module.exports = {
     initiatePayment,
-    confirmPayment
+    verifyPayment,
+    downloadReceipt
 };
-
-
-
-
-
-
-// // Backend for Helix/controllers/paymentController.js
-// const nodemailer = require("nodemailer");
-// const Registration = require("../models/Registration");
-// const paypal = require('@paypal/checkout-server-sdk'); // PayPal SDK
-// const pricing = require('../models/Pricing'); // Import pricing model
-
-// // --- Initialize Nodemailer Transporter ONCE ---
-// // This transporter is defined globally to avoid recreating it on every request.
-// const transporter = nodemailer.createTransport({
-//     host: process.env.EMAIL_HOST,
-//     port: parseInt(process.env.EMAIL_PORT), // Port should be a number
-//     secure: process.env.EMAIL_SECURE === 'true', // Convert string to boolean
-//     auth: {
-//         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASS,
-//     },
-// });
-
-// // --- Configure PayPal Environment ONCE ---
-// // Use Sandbox for development/testing, Live for production
-// const environment = process.env.NODE_ENV === 'production'
-//     ? new paypal.core.LiveEnvironment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_CLIENT_SECRET)
-//     : new paypal.core.SandboxEnvironment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_CLIENT_SECRET);
-// const paypalClient = new paypal.core.PayPalHttpClient(environment);
-
-
-// // Helper function to get price based on plan, type, and category
-// function getPlanPrice(type, category, planName) {
-//     // --- NEW: Detailed Logging for Pricing Lookup ---
-//     console.log(`DEBUG: getPlanPrice called with -> Type: '${type}', Category: '${category}', Plan: '${planName}'`);
-//     console.log(`DEBUG: typeof type: ${typeof type}, typeof category: ${typeof category}, typeof planName: ${typeof planName}`);
-
-//     // Check if pricing[type] exists
-//     if (!pricing[type]) {
-//         console.warn(`DEBUG: pricing['${type}'] does NOT exist. Available types: ${Object.keys(pricing).join(', ')}`);
-//         return "0.00";
-//     }
-//     console.log(`DEBUG: pricing['${type}'] exists.`);
-
-//     // Check if pricing[type][category] exists
-//     if (!pricing[type][category]) {
-//         console.warn(`DEBUG: pricing['${type}']['${category}'] does NOT exist. Available categories for '${type}': ${Object.keys(pricing[type]).join(', ')}`);
-//         return "0.00";
-//     }
-//     console.log(`DEBUG: pricing['${type}']['${category}'] exists.`);
-
-//     // Check if pricing[type][category][planName] exists
-//     if (!pricing[type][category][planName]) {
-//         console.warn(`DEBUG: pricing['${type}']['${category}']['${planName}'] does NOT exist. Available plans for '${type}' and '${category}': ${Object.keys(pricing[type][category]).join(', ')}`);
-//         return "0.00";
-//     }
-//     console.log(`DEBUG: Found price for '${planName}'.`);
-
-//     // If all checks pass, return the price
-//     return pricing[type][category][planName].toString(); // PayPal API expects amount as string
-// }
-
-// /**
-//  * initiatePayment:
-//  * 1. Receives full registration data from frontend along with sourceToken.
-//  * 2. Verifies sourceToken to get sourceSite ID.
-//  * 3. Looks up the price using the Pricing model.
-//  * 4. Saves initial registration data to MongoDB with 'pending_payment' status.
-//  * 5. Sends a pre-payment email notification to the admin.
-//  * 6. Creates a PayPal order using the PayPal SDK.
-//  * 7. Updates the MongoDB record with the PayPal Order ID.
-//  * 8. Responds to the frontend with the PayPal Order ID for button rendering.
-//  */
-// const initiatePayment = async (req, res) => {
-//     // This log should now show a parsed JSON object, not a buffer.
-//     console.log("Backend: Received request body for initiatePayment:", req.body);
-
-//     try {
-//         // Destructure all expected registration fields from the request body
-//         const {
-//             firstName, lastName, email, mobileNumber, address, state, country,
-//             university, affiliation, linkedin, twitter, abstractTitle, interest,
-//             abstractFile, demoFile, // These are currently just string paths, actual file upload handled separately
-//             plan, type, category, // These are crucial for pricing lookup
-//             sourceToken // This JWT comes from your 60 websites, passed through React app
-//         } = req.body;
-
-//         // The authMiddleware (applied to this route) should have verified the sourceToken
-//         // and attached its payload to req.sourceTokenPayload.
-//         const sourceSiteId = req.sourceTokenPayload ? req.sourceTokenPayload.sourceId : 'unknown_source';
-//         if (sourceSiteId === 'unknown_source') {
-//             console.error("❌ Source token payload missing or invalid. Check authMiddleware application.");
-//             // In a production scenario, you might want to return an error here
-//             // return res.status(401).json({ message: "Unauthorized source or missing token." });
-//         }
-
-//         // Validate plan, type, category, and get the amount from your pricing model
-//         const amount = getPlanPrice(type, category, plan);
-//         if (amount === "0.00") {
-//             return res.status(400).json({ message: "Invalid conference plan, type, or category selected. Please check pricing." });
-//         }
-
-//         // Create a new Registration entry. Status starts as 'pending_payment'.
-//         const newEntry = new Registration({
-//             firstName, lastName, email, mobileNumber, address, state, country,
-//             university, affiliation, linkedin, twitter, abstractTitle, interest,
-//             abstractFile, demoFile,
-//             plan, type, category,
-//             sourceSite: sourceSiteId, // Assign the verified source ID
-//             status: "pending_payment",
-//             registrationDate: new Date(),
-//         });
-
-//         // Save the initial user details to MongoDB. This generates an _id for the record.
-//         await newEntry.save();
-
-//         // --- Send Pre-Payment Email to Admin ---
-//         try {
-//             await transporter.sendMail({
-//                 from: `"Helix Conferences" <${process.env.EMAIL_USER}>`,
-//                 to: process.env.ADMIN_EMAIL,
-//                 subject: `New Payment Initiated: ${firstName} ${lastName} for ${plan}`,
-//                 text: `User ${email} from ${sourceSiteId} selected the ${plan} plan (${type} - ${category}) and initiated payment for $${amount}. Registration ID: ${newEntry._id}`,
-//                 html: `
-//                     <h2>New Registration - Payment Initiated</h2>
-//                     <p><strong>User:</strong> ${firstName} ${lastName} (${email})</p>
-//                     <p><strong>Selected Plan:</strong> ${plan} (Type: ${type}, Category: ${category})</p>
-//                     <p><strong>Amount:</strong> <strong>$${amount} USD</strong></p>
-//                     <p><strong>Source Website:</strong> ${sourceSiteId}</p>
-//                     <p><strong>Temporary Registration ID:</strong> ${newEntry._id}</p>
-//                     <p><strong>Status:</strong> Pending Payment (Waiting for PayPal confirmation)</p>
-//                     <p><em>Full details are saved in MongoDB.</em></p>
-//                 `
-//             });
-//             console.log(`Pre-payment email sent to admin for ${email}.`);
-//         } catch (emailError) {
-//             console.error("❌ Error sending pre-payment email:", emailError);
-//             // Log the error but don't stop the payment process
-//         }
-
-//         // --- Create PayPal Order ---
-//         const request = new paypal.orders.OrdersCreateRequest();
-//         request.prefer("return=representation"); // Get full representation of the order back
-//         request.requestBody({
-//             intent: "CAPTURE", // Funds are captured immediately upon buyer approval
-//             purchase_units: [{
-//                 amount: {
-//                     currency_code: "USD", // Ensure this matches your pricing currency
-//                     value: amount, // Use the validated amount from pricing model
-//                 },
-//                 description: `Conference Registration - ${plan} for ${email}`,
-//                 custom_id: newEntry._id.toString(), // Important: Link PayPal order to your MongoDB record
-//                 soft_descriptor: "HELIXCONFREG", // Appears on buyer's credit card statement
-//             }],
-//             application_context: {
-//                 return_url: `${process.env.FRONTEND_URL}/paypal-success`, // Redirects after successful payment
-//                 cancel_url: `${process.env.FRONTEND_URL}/paypal-cancel`,   // Redirects if buyer cancels
-//                 shipping_preference: "NO_SHIPPING", // No shipping address needed for digital service
-//                 user_action: "PAY_NOW", // Changes button text from "Continue" to "Pay Now"
-//             }
-//         });
-
-//         const order = await paypalClient.execute(request);
-        
-//         // Update the Registration record with PayPal's Order ID
-//         newEntry.paypalOrderId = order.result.id;
-//         await newEntry.save();
-
-//         // Respond to the frontend with the PayPal Order ID
-//         res.status(200).json({
-//             message: "Payment initiated successfully, proceed to PayPal.",
-//             orderID: order.result.id, // Frontend uses this to render PayPal button
-//         });
-
-//     } catch (error) {
-//         console.error("❌ Payment initiation failed:", error);
-//         // More specific error handling could differentiate between PayPal API errors and DB errors
-//         res.status(500).json({ message: "Failed to initiate payment. Please try again.", error: error.message });
-//     }
-// };
-
-// /**
-//  * confirmPayment (PayPal Webhook Listener):
-//  * This endpoint is hit by PayPal when a payment event occurs (e.g., CHECKOUT.ORDER.COMPLETED).
-//  * 1. IMPORTANT: Verifies the authenticity of the PayPal webhook request (signature validation).
-//  * 2. Parses the webhook event payload.
-//  * 3. Finds the corresponding registration record using the PayPal Order ID.
-//  * 4. Updates the registration status to 'paid', stores payment details and capture ID.
-//  * 5. Sends a post-payment email notification to the admin.
-//  * 6. Emits a Socket.IO event to all connected clients for real-time updates.
-//  * 7. Responds with 200 OK to PayPal to acknowledge receipt of the webhook.
-//  */
-// const confirmPayment = async (req, res) => {
-//     // --- IMPORTANT: PayPal Webhook Signature Verification ---
-//     // This is CRITICAL for security to ensure the request truly comes from PayPal.
-//     // It uses the raw request body, which is why `express.raw()` middleware is needed.
-//     const WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID;
-//     const WEBHOOK_SECRET = process.env.PAYPAL_WEBHOOK_SECRET; // This might not be needed for SDK verify but good to have
-
-//     // Extract headers for verification
-//     const paypalTransmissionId = req.headers['paypal-transmission-id'];
-//     const paypalTransmissionTime = req.headers['paypal-transmission-time'];
-//     const paypalCertUrl = req.headers['paypal-cert-url'];
-//     const paypalAuthAlgo = req.headers['paypal-auth-algo'];
-//     const paypalHmac = req.headers['paypal-transmission-sig'];
-
-//     if (!paypalTransmissionId || !paypalTransmissionTime || !paypalCertUrl || !paypalAuthAlgo || !paypalHmac) {
-//         console.error("❌ PayPal Webhook Error: Missing required headers for signature verification.");
-//         return res.status(400).send("Missing PayPal webhook headers.");
-//     }
-
-//     try {
-//         // The raw body is needed for signature verification
-//         // Ensure `express.raw({type: 'application/json'})` is used in server.js before `express.json()`
-//         const requestBodyString = req.body.toString(); 
-//         const webhookEvent = JSON.parse(requestBodyString); // Parse it AFTER getting the raw string
-
-//         // Verify the webhook signature using PayPal's SDK utility
-//         // This SDK method takes care of fetching certs, hashing, etc.
-//         const isValid = await paypal.notification.WebhookEvent.verify({
-//             auth_algo: paypalAuthAlgo,
-//             cert_url: paypalCertUrl,
-//             transmission_id: paypalTransmissionId,
-//             transmission_time: paypalTransmissionTime,
-//             transmission_sig: paypalHmac,
-//             webhook_id: WEBHOOK_ID,
-//             // For older SDK versions or complex setups, you might need to compute crc32
-//             // crc32: paypal.notification.WebhookEvent.getCrc32(requestBodyString) 
-//         }, requestBodyString);
-
-//         if (!isValid) {
-//             console.error("❌ PayPal Webhook Error: Invalid signature. Request is not from PayPal.");
-//             return res.status(403).send("Invalid webhook signature.");
-//         }
-//         console.log("✅ PayPal Webhook signature verified successfully.");
-
-
-//         // Process only CHECKOUT.ORDER.COMPLETED events
-//         if (webhookEvent.event_type !== 'CHECKOUT.ORDER.COMPLETED') {
-//             console.log(`Received PayPal webhook event type: ${webhookEvent.event_type}. Not processing as it's not a completion event.`);
-//             // Always respond with 200 OK to PayPal for events you don't process to avoid retries
-//             return res.status(200).send(`Event type ${webhookEvent.event_type} not handled by this endpoint.`);
-//         }
-
-//         const paypalOrderId = webhookEvent.resource.id;
-//         // Extract the capture ID from the completed order details
-//         const captureId = webhookEvent.resource.purchase_units[0].payments.captures[0].id;
-//         const paymentAmount = webhookEvent.resource.purchase_units[0].payments.captures[0].amount.value;
-//         const paymentCurrency = webhookEvent.resource.purchase_units[0].payments.captures[0].amount.currency_code;
-
-//         // Find the registration record using the PayPal Order ID and update its status
-//         const registration = await Registration.findOneAndUpdate(
-//             { paypalOrderId: paypalOrderId, status: 'pending_payment' }, // Find by PayPal Order ID and ensure it's still pending
-//             {
-//                 $set: {
-//                     status: "paid",
-//                     paypalCaptureId: captureId,
-//                     paymentDetails: webhookEvent.resource, // Store the full webhook payload for auditing
-//                     paymentDate: new Date(),
-//                 },
-//             },
-//             { new: true } // Return the updated document
-//         );
-
-//         if (!registration) {
-//             console.error(`❌ Registration not found or already processed for PayPal Order ID: ${paypalOrderId}`);
-//             // Respond 200 to PayPal to prevent retries, even if our internal update fails or is redundant
-//             return res.status(200).send("Registration not found or already processed for this webhook.");
-//         }
-
-//         // --- Send Post-Payment Email to Admin ---
-//         try {
-//             await transporter.sendMail({
-//                 from: `"Helix Conferences" <${process.env.EMAIL_USER}>`,
-//                 to: process.env.ADMIN_EMAIL,
-//                 subject: `🚀 Payment Confirmed: ${registration.firstName} ${registration.lastName} for ${registration.plan}`,
-//                 html: `
-//                     <h2>Payment Confirmed! New Registration Completed!</h2>
-//                     <p><strong>Name:</strong> ${registration.firstName} ${registration.lastName}</p>
-//                     <p><strong>Email:</strong> ${registration.email}</p>
-//                     <p><strong>Plan:</strong> ${registration.plan} (Type: ${registration.type}, Category: ${registration.category})</p>
-//                     <p><strong>Amount Paid:</strong> <strong>$${paymentAmount} ${paymentCurrency}</strong></p>
-//                     <p><strong>Source Website:</strong> ${registration.sourceSite}</p>
-//                     <p><strong>PayPal Order ID:</strong> ${paypalOrderId}</p>
-//                     <p><strong>PayPal Capture ID:</strong> ${captureId}</p>
-//                     <p><strong>Your Registration ID:</strong> ${registration._id}</p>
-//                     <p><strong>Status:</strong> PAID</p>
-//                     <p><em>Full payment details available in MongoDB.</em></p>
-//                 `,
-//             });
-//             console.log(`Post-payment confirmation email sent to admin for ${registration.email}.`);
-//         } catch (emailError) {
-//             console.error("❌ Error sending post-payment confirmation email:", emailError);
-//         }
-
-//         // --- Emit WebSocket Broadcast for Real-time Updates ---
-//         if (global.io) { // `global.io` is set in server.js
-//             global.io.emit('new_registration', {
-//                 message: 'A new conference registration has been completed!',
-//                 name: `${registration.firstName} ${registration.lastName}`,
-//                 email: registration.email,
-//                 plan: registration.plan,
-//                 sourceSite: registration.sourceSite,
-//                 timestamp: new Date().toISOString(),
-//             });
-//             console.log(`✅ Emitted Socket.IO event 'new_registration' for ${registration.email}`);
-//         } else {
-//             console.warn("Socket.IO not initialized or accessible. Real-time update for new registration skipped.");
-//         }
-
-//         // Always respond with 200 OK to PayPal webhooks to acknowledge receipt and prevent retries
-//         res.status(200).send("Webhook received and processed.");
-
-//     } catch (error) {
-//         console.error("❌ PayPal Webhook processing failed:", error);
-//         // Log the full error for debugging.
-//         // DO NOT send sensitive error details back to PayPal.
-//         res.status(500).send("Error processing webhook.");
-//     }
-// };
-
-// module.exports = {
-//     initiatePayment,
-//     confirmPayment,
-// };

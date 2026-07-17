@@ -2,17 +2,15 @@ const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer'); // Make sure you have nodemailer installed!
 
-// Configure Nodemailer transporter for Hostinger email
+// Configure Nodemailer transporter for Resend
 const transporter = nodemailer.createTransport({
-    host: 'smtp.hostinger.com', // Hostinger's SMTP host
-    port: 465,                   // Hostinger's SMTP secure port (usually 465 for SSL)
-    secure: true,                // Use SSL
+    host: 'smtp.resend.com',
+    port: 465,
+    secure: true,
     auth: {
-        user: process.env.EMAIL_USER,     // Your full Hostinger email address (e.g., info@yourdomain.com)
-        pass: process.env.EMAIL_PASS      // The password for your Hostinger email account
+        user: 'resend',
+        pass: process.env.RESEND_API_KEY
     },
-    // Optional: You might need to set a timeout if you experience connection issues
-    // timeout: 10000, // 10 seconds
 });
 
 router.post('/send-registration-email', async (req, res) => {

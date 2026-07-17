@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Bytez = require('bytez.js');
 const ChatbotFaq = require('../models/chatbotFaqModel');
 const ChatLog = require('../models/chatbotLogModel');
 const ChatbotUser = require('../models/chatbotUserModel');
@@ -14,14 +14,14 @@ const otpCache = new NodeCache({ stdTTL: 300 });
 // Initialize Resend
 const resendClient = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-// Initialize Google Generative AI conditionally
-let genAI;
+// Initialize Bytez AI conditionally
+let bytezClient;
 try {
-  if (process.env.GOOGLE_API_KEY) {
-    genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+  if (process.env.BYTEZ_API_KEY) {
+    bytezClient = new Bytez(process.env.BYTEZ_API_KEY);
   }
 } catch (error) {
-  console.error("Google AI initialization error:", error.message);
+  console.error("Bytez AI initialization error:", error.message);
 }
 
 const staticFaqs = [
@@ -102,8 +102,8 @@ exports.handleChat = async (req, res) => {
       });
     }
 
-    // 2. Fallback to Google Gemini if no keyword match
-    if (!genAI) {
+    // 2. Fallback to Bytez AI if no keyword match
+    if (!bytezClient) {
       const fallbackResponse = "I am currently unable to connect to the AI service, but I can help you with registration, abstract submission, pricing, or contacting us.";
       await ChatLog.create({ userMessage: message, botResponse: fallbackResponse });
       return res.json({ response: fallbackResponse });
@@ -131,8 +131,8 @@ ${conferencesList}
 
 Be helpful, engaging, and professional.`;
 
-    // 3. Check Cache before calling Gemini API
-    const cacheKey = `gemini_${lowerMessage}`;
+    // 3. Check Cache before calling Bytez API
+    const cacheKey = `bytez_${lowerMessage}`;
     const cachedResponse = aiCache.get(cacheKey);
     
     if (cachedResponse) {
@@ -141,13 +141,21 @@ Be helpful, engaging, and professional.`;
       return res.json({ response: cachedResponse });
     }
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
-      systemInstruction: systemPrompt 
-    });
+    const model = bytezClient.model("mistralai/Mistral-7B-Instruct-v0.2");
+    
+    const input = [
+      { "role": "system", "content": systemPrompt },
+      { "role": "user", "content": message }
+    ];
 
-    const result = await model.generateContent(message);
-    const aiResponse = result.response.text();
+    const { error, output } = await model.run(input);
+    
+    if (error) {
+      console.error("Bytez API run error:", error);
+      throw new Error("Failed to generate content from Bytez API");
+    }
+
+    const aiResponse = output;
 
     // Save response to cache
     aiCache.set(cacheKey, aiResponse);
@@ -162,9 +170,15 @@ Be helpful, engaging, and professional.`;
   } catch (error) {
     console.error("Chatbot Error:", error);
     
-    // Graceful fallback for 503 Service Unavailable from Gemini API
+    // Graceful fallback for API errors
     if (error.status === 503 || (error.message && error.message.includes('503'))) {
       const fallbackResponse = "The AI service is currently experiencing high demand. I can still help you with registration, abstract submission, pricing, or contacting us.";
+      return res.json({ response: fallbackResponse });
+    }
+
+    // Graceful fallback for Rate Limit (429) errors
+    if (error.status === 429 || (error.message && error.message.includes('429'))) {
+      const fallbackResponse = "I'm currently busy helping another user! Please wait a few seconds and try your message again.";
       return res.json({ response: fallbackResponse });
     }
     

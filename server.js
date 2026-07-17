@@ -20,6 +20,7 @@ const emailRoutes1 = require("./routes/helixconferenceEmailrouter");
 const router2 = require("./routes/helixsyngeryrouter");
 const chatbotRoutes = require("./routes/chatbotRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const registrationRoutes = require("./routes/registrationRoutes");
 
 const app = express();
 app.set('trust proxy', 1); // Trust first proxy for accurate rate limiting IP detection
@@ -164,6 +165,9 @@ mongoose
 
 // Payment Routes
 app.use("/api/payment", paymentRoutes);
+
+// Registration Routes
+app.use("/api/registrations", registrationRoutes);
 
 // Existing Routes
 app.use("/api/source", sourceRoutes);
