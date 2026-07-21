@@ -22,6 +22,7 @@
   "license": "ISC",
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.1",
+    "axios": "^1.18.1",
     "bytez.js": "^3.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -37,6 +38,7 @@
     "pdfkit": "^0.19.1",
     "razorpay": "^2.9.8",
     "resend": "^6.12.4",
+    "sharp": "^0.35.3",
     "socket.io": "^4.7.5",
     "uuid": "^11.1.0",
     "validator": "^13.15.26"

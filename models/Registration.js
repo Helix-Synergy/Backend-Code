@@ -20,12 +20,16 @@ const registrationSchema = new mongoose.Schema({
 
     // Conference specific details for pricing and type
     plan: { type: String, required: true }, // e.g., "e-Poster", "Oral Presentation"
+    orderDetails: { type: Array, default: [] }, // Array of objects with name, price, quantity
     type: { type: String, enum: ['hybrid', 'webinar'], required: true }, // e.g., "hybrid", "webinar"
     category: { type: String, enum: ['academic', 'business'], required: true }, // e.g., "academic", "business"
     
     sourceSite: { type: String, required: true }, // The ID obtained from the verified sourceToken
+    conferenceName: { type: String }, // Store the actual name for receipts
+    conferenceDate: { type: String }, // Store the actual date for receipts
     
     // Payment-related fields
+    invoiceNumber: { type: String }, // e.g., HEX-2026-07-001
     status: {
         type: String,
         enum: ['pending_payment', 'paid', 'failed', 'refunded'],

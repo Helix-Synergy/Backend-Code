@@ -55,10 +55,13 @@ const initiatePayment = async (req, res) => {
             country: participantInfo.country,
             university: participantInfo.university,
             affiliation: participantInfo.affiliation,
-            plan: orderDetails[0].name,
+            plan: orderDetails.map(item => item.name).join(' + '),
+            orderDetails: orderDetails,
             type: "hybrid", // Defaulting as placeholder, adapt if provided in body
             category: "academic", // Defaulting as placeholder
             sourceSite: sourceSiteId,
+            conferenceName: conferenceName,
+            conferenceDate: req.body.conferenceDate,
             status: "pending_payment",
             registrationDate: new Date(),
         });
@@ -96,6 +99,124 @@ const initiatePayment = async (req, res) => {
 };
 
 /**
+ * fulfillPayment:
+ * Core fulfillment logic (updates DB, generates invoice, sends emails/PDF, emits socket).
+ * Returns the updated registration doc or null if already processed.
+ */
+const fulfillPayment = async (registrationId, razorpay_order_id, razorpay_payment_id, razorpay_signature) => {
+    let paymentMethod = 'Unknown';
+    try {
+        const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
+        paymentMethod = paymentDetails.method; // "upi", "card", "netbanking", etc.
+    } catch (err) {
+        console.error("❌ Failed to fetch payment method from Razorpay:", err);
+    }
+
+    const currentYear = new Date().getFullYear();
+    const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, '0');
+    const invoicePrefix = `HEX-${currentYear}-${currentMonth}-`;
+
+    // Find highest invoice number for this month
+    const lastReg = await Registration.findOne({ invoiceNumber: new RegExp(`^${invoicePrefix}`) })
+        .sort({ invoiceNumber: -1 })
+        .exec();
+
+    let nextSlno = 1;
+    if (lastReg && lastReg.invoiceNumber) {
+        const lastSlno = parseInt(lastReg.invoiceNumber.split('-').pop(), 10);
+        if (!isNaN(lastSlno)) {
+            nextSlno = lastSlno + 1;
+        }
+    }
+    const invoiceNumber = `${invoicePrefix}${nextSlno.toString().padStart(3, '0')}`;
+
+    const registration = await Registration.findOneAndUpdate(
+        { _id: registrationId, status: 'pending_payment' },
+        {
+            $set: {
+                status: "paid",
+                invoiceNumber: invoiceNumber,
+                "paymentDetails.paymentGateway": "Razorpay",
+                "paymentDetails.method": paymentMethod,
+                "paymentDetails.razorpayOrderId": razorpay_order_id,
+                "paymentDetails.razorpayPaymentId": razorpay_payment_id,
+                "paymentDetails.razorpaySignature": razorpay_signature,
+                paymentDate: new Date(),
+            },
+        },
+        { new: true }
+    );
+
+    if (!registration) {
+        return null; // Already processed or not found
+    }
+
+    // --- Send Post-Payment Email to Admin ---
+    try {
+        await transporter.sendMail({
+            from: `"Helix Conferences" <${process.env.ADMIN_EMAIL}>`,
+            to: process.env.ADMIN_EMAIL,
+            subject: `🚀 Razorpay Payment Confirmed: ${registration.firstName} ${registration.lastName}`,
+            html: `
+                <h2>Razorpay Payment Confirmed! New Registration Completed!</h2>
+                <p><strong>Name:</strong> ${registration.firstName} ${registration.lastName}</p>
+                <p><strong>Email:</strong> ${registration.email}</p>
+                <p><strong>Registration ID:</strong> ${registration._id}</p>
+                <p><strong>Razorpay Payment ID:</strong> ${razorpay_payment_id}</p>
+            `,
+        });
+        console.log(`Post-payment confirmation email sent to admin for ${registration.email} via Razorpay.`);
+    } catch (emailError) {
+        console.error("❌ Error sending post-payment confirmation email to admin:", emailError);
+    }
+
+    // --- Generate PDF Receipt and Email to Participant ---
+    try {
+        const pdfBuffer = await generateReceipt(registration);
+        
+        await transporter.sendMail({
+            from: `"Helix Conferences" <${process.env.ADMIN_EMAIL}>`,
+            to: registration.email,
+            subject: `Payment Receipt - Helix Conferences`,
+            html: `
+                <h2>Thank you for your registration!</h2>
+                <p>Dear ${registration.firstName},</p>
+                <p>Your payment for <strong>${registration.plan}</strong> has been successfully processed.</p>
+                <p>Please find attached your payment receipt.</p>
+                <br>
+                <p>Best Regards,</p>
+                <p>Helix Conferences Team</p>
+            `,
+            attachments: [
+                {
+                    filename: `Receipt_${registration._id}.pdf`,
+                    content: pdfBuffer,
+                    contentType: 'application/pdf'
+                }
+            ]
+        });
+        console.log(`Receipt email sent to participant ${registration.email}.`);
+    } catch (emailError) {
+        console.error("❌ Error sending receipt email to participant:", emailError);
+    }
+
+    // --- Emit WebSocket Broadcast for Real-time Updates ---
+    if (global.io) {
+        global.io.emit('new_registration', {
+            message: 'A new conference registration has been completed!',
+            name: `${registration.firstName} ${registration.lastName}`,
+            email: registration.email,
+            plan: registration.plan,
+            sourceSite: registration.sourceSite,
+            timestamp: new Date().toISOString(),
+        });
+        console.log(`✅ Emitted Socket.IO event 'new_registration' for ${registration.email} (Razorpay)`);
+    }
+
+    return registration;
+};
+
+/**
  * verifyPayment:
  * Verifies the Razorpay signature sent by the frontend after successful checkout.
  */
@@ -112,101 +233,75 @@ const verifyPayment = async (req, res) => {
             return res.status(400).json({ message: "Invalid payment signature" });
         }
 
-        let paymentMethod = 'Unknown';
-        try {
-            const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
-            paymentMethod = paymentDetails.method; // "upi", "card", "netbanking", etc.
-        } catch (err) {
-            console.error("❌ Failed to fetch payment method from Razorpay:", err);
-        }
-
-        const registration = await Registration.findOneAndUpdate(
-            { _id: registrationId, status: 'pending_payment' },
-            {
-                $set: {
-                    status: "paid",
-                    "paymentDetails.paymentGateway": "Razorpay",
-                    "paymentDetails.method": paymentMethod,
-                    "paymentDetails.razorpayOrderId": razorpay_order_id,
-                    "paymentDetails.razorpayPaymentId": razorpay_payment_id,
-                    "paymentDetails.razorpaySignature": razorpay_signature,
-                    paymentDate: new Date(),
-                },
-            },
-            { new: true }
-        );
-
+        const registration = await fulfillPayment(registrationId, razorpay_order_id, razorpay_payment_id, razorpay_signature);
         if (!registration) {
-            console.error(`❌ Registration not found or already processed for Order ID: ${razorpay_order_id}`);
-            return res.status(400).json({ message: "Registration not found or already processed." });
-        }
-
-        // --- Send Post-Payment Email to Admin ---
-        try {
-            await transporter.sendMail({
-                from: `"Helix Conferences" <${process.env.ADMIN_EMAIL}>`,
-                to: process.env.ADMIN_EMAIL,
-                subject: `🚀 Razorpay Payment Confirmed: ${registration.firstName} ${registration.lastName}`,
-                html: `
-                    <h2>Razorpay Payment Confirmed! New Registration Completed!</h2>
-                    <p><strong>Name:</strong> ${registration.firstName} ${registration.lastName}</p>
-                    <p><strong>Email:</strong> ${registration.email}</p>
-                    <p><strong>Registration ID:</strong> ${registration._id}</p>
-                    <p><strong>Razorpay Payment ID:</strong> ${razorpay_payment_id}</p>
-                `,
-            });
-            console.log(`Post-payment confirmation email sent to admin for ${registration.email} via Razorpay.`);
-        } catch (emailError) {
-            console.error("❌ Error sending post-payment confirmation email to admin:", emailError);
-        }
-
-        // --- Generate PDF Receipt and Email to Participant ---
-        try {
-            const pdfBuffer = await generateReceipt(registration);
-            
-            await transporter.sendMail({
-                from: `"Helix Conferences" <${process.env.ADMIN_EMAIL}>`,
-                to: registration.email,
-                subject: `Payment Receipt - Helix Conferences`,
-                html: `
-                    <h2>Thank you for your registration!</h2>
-                    <p>Dear ${registration.firstName},</p>
-                    <p>Your payment for <strong>${registration.plan}</strong> has been successfully processed.</p>
-                    <p>Please find attached your payment receipt.</p>
-                    <br>
-                    <p>Best Regards,</p>
-                    <p>Helix Conferences Team</p>
-                `,
-                attachments: [
-                    {
-                        filename: `Receipt_${registration._id}.pdf`,
-                        content: pdfBuffer,
-                        contentType: 'application/pdf'
-                    }
-                ]
-            });
-            console.log(`Receipt email sent to participant ${registration.email}.`);
-        } catch (emailError) {
-            console.error("❌ Error sending receipt email to participant:", emailError);
-        }
-
-        // --- Emit WebSocket Broadcast for Real-time Updates ---
-        if (global.io) {
-            global.io.emit('new_registration', {
-                message: 'A new conference registration has been completed!',
-                name: `${registration.firstName} ${registration.lastName}`,
-                email: registration.email,
-                plan: registration.plan,
-                sourceSite: registration.sourceSite,
-                timestamp: new Date().toISOString(),
-            });
-            console.log(`✅ Emitted Socket.IO event 'new_registration' for ${registration.email} (Razorpay)`);
+            console.error(`✅ Registration already processed for Order ID: ${razorpay_order_id} (likely by webhook)`);
+            return res.status(200).json({ success: true, message: "Payment already processed." });
         }
 
         res.status(200).json({ success: true, message: "Payment verified successfully" });
     } catch (error) {
         console.error("❌ Error verifying payment:", error);
         res.status(500).json({ message: "Payment verification failed", error: error.message });
+    }
+};
+
+/**
+ * razorpayWebhook:
+ * Listens for background events from Razorpay (e.g. payment.captured) to ensure fulfillment
+ * happens even if the user drops off the frontend.
+ */
+const razorpayWebhook = async (req, res) => {
+    try {
+        const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+        if (!webhookSecret) {
+            console.error("❌ RAZORPAY_WEBHOOK_SECRET not set in environment.");
+            return res.status(500).send("Webhook secret not configured.");
+        }
+
+        const signature = req.headers['x-razorpay-signature'];
+        
+        // Since express.json() is configured globally before this route, req.body is already an object.
+        const bodyStr = JSON.stringify(req.body);
+
+        const expectedSignature = crypto.createHmac('sha256', webhookSecret)
+            .update(bodyStr)
+            .digest('hex');
+
+        // Prevent timing attacks using crypto.timingSafeEqual
+        const isSignatureValid = crypto.timingSafeEqual(
+            Buffer.from(expectedSignature),
+            Buffer.from(signature)
+        );
+
+        if (!isSignatureValid) {
+            console.error("❌ Invalid Razorpay webhook signature");
+            return res.status(400).send("Invalid signature");
+        }
+
+        const event = req.body;
+
+        if (event.event === 'payment.captured' || event.event === 'order.paid') {
+            const paymentEntity = event.payload.payment.entity;
+            const razorpay_order_id = paymentEntity.order_id;
+            const razorpay_payment_id = paymentEntity.id;
+            
+            const registrationDoc = await Registration.findOne({ "paymentDetails.razorpayOrderId": razorpay_order_id });
+            
+            if (registrationDoc) {
+                if (registrationDoc.status === 'pending_payment') {
+                    console.log(`Webhook: fulfilling payment for order ${razorpay_order_id}`);
+                    await fulfillPayment(registrationDoc._id, razorpay_order_id, razorpay_payment_id, "webhook_signature_verified");
+                } else {
+                    console.log(`Webhook: order ${razorpay_order_id} already processed.`);
+                }
+            }
+        }
+
+        res.status(200).send("Webhook received");
+    } catch (error) {
+        console.error("❌ Error processing webhook:", error);
+        res.status(500).send("Webhook processing failed");
     }
 };
 
@@ -243,5 +338,6 @@ const downloadReceipt = async (req, res) => {
 module.exports = {
     initiatePayment,
     verifyPayment,
+    razorpayWebhook,
     downloadReceipt
 };

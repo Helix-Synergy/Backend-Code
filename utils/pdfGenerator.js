@@ -4,14 +4,32 @@ const path = require('path');
 const fs = require('fs');
 
 /**
- * Generates a PDF receipt for a conference registration.
- * @param {Object} registration - The registration document from the database.
- * @returns {Promise<Buffer>} - A promise that resolves to the PDF buffer.
+ * Convert numbers to words for USD
  */
+const numberToWords = (num) => {
+    const a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
+    const b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
+
+    if ((num = num.toString()).length > 9) return 'overflow';
+    const n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+    if (!n) return;
+    let str = '';
+    str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
+    str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
+    str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
+    str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
+    str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
+    
+    return str.trim() ? str.trim() + ' Dollars Only' : 'Zero Dollars';
+};
+
 const generateReceipt = (registration) => {
     return new Promise((resolve, reject) => {
         try {
-            const doc = new PDFDocument({ margin: 50, size: 'A4' });
+            const doc = new PDFDocument({ 
+                size: 'A4',
+                margins: { top: 50, bottom: 0, left: 50, right: 50 }
+            });
             const buffers = [];
             
             doc.on('data', buffers.push.bind(buffers));
@@ -20,54 +38,33 @@ const generateReceipt = (registration) => {
                 resolve(pdfData);
             });
 
-            const primaryColor = '#0b328a'; // Dark blue for INVOICE and lines
+            const primaryColor = '#0b328a';
             const textColor = '#000000';
-            const tableHeaderColor = '#000000';
-
+            
+            // --- HEADER ---
             // Top Left Logo
-            const logoPath = path.join(__dirname, 'Header-logo.png');
+            const logoPath = path.join(__dirname, '..', '..', 'frontend', 'src', 'assets', 'images', 'Helix Conference.png');
             if (fs.existsSync(logoPath)) {
-                // Adjust width as needed for proportion
-                doc.image(logoPath, 50, 35, { width: 150 });
+                doc.image(logoPath, 50, 15, { width: 130 });
             } else {
-                // Fallback text if logo missing
                 doc.font('Helvetica-Bold').fontSize(16).fillColor(primaryColor).text('Helix Conferences', 50, 45);
-                doc.fontSize(8).text('A UNIT OF OCTACREST CORPORATE LLC', 50, 65);
             }
 
-            // Top Right INVOICE text
+            // Top Right PAYMENT RECEIPT text (Full width right aligned to avoid wrapping)
             doc.font('Helvetica-Bold')
                .fillColor(primaryColor)
-               .fontSize(40)
-               .text('INVOICE', 300, 45, { width: 250, align: 'right' });
+               .fontSize(26)
+               .text('PAYMENT RECEIPT', 50, 60, { width: 495, align: 'right' });
 
             // Thick blue line under header
-            doc.moveTo(50, 120)
-               .lineTo(550, 120)
+            doc.moveTo(50, 115)
+               .lineTo(545, 115)
                .lineWidth(3)
                .strokeColor(primaryColor)
                .stroke();
 
-            // Contact Info section
-            doc.font('Helvetica-Bold')
-               .fontSize(9)
-               .fillColor(textColor);
-            
-            const contactY = 135;
-            // Phone
-            doc.text('+1-7036-516-096', 50, contactY, { width: 120, align: 'center' });
-            // Email
-            doc.text('hello@helixconferences.com', 200, contactY, { width: 150, align: 'center' });
-            // Web
-            doc.text('www.helixconferences.com', 380, contactY, { width: 170, align: 'center' });
-
-            // Address line
-            doc.font('Helvetica').text('1200 West 73rd Avenue #1100, Vancouver, British Columbia, Canada', 50, contactY + 20, { width: 500, align: 'center' });
-
-            // Invoice details
-            const invoiceY = 195;
-            const shortId = registration._id.toString().substring(0, 6).toUpperCase();
-            const year = moment().format('YYYY');
+            // --- INVOICE DETAILS ---
+            const invoiceY = 135;
             
             const paymentDate = registration.paymentDate 
                 ? moment(registration.paymentDate) 
@@ -75,115 +72,162 @@ const generateReceipt = (registration) => {
                 
             const dateStr = paymentDate.format('DD-MMM-YYYY');
             const dueStr = paymentDate.add(7, 'days').format('DD-MMM-YYYY');
-
-            doc.font('Helvetica').fontSize(11);
-            doc.text(`Invoice No : INV-${year}-${shortId}`, 50, invoiceY);
-            doc.text(`Date: ${dateStr}`, 450, invoiceY);
             
-            doc.text(`Due Date: ${dueStr}`, 50, invoiceY + 25);
+            // Fallback for invoice number if not generated yet
+            const invNo = registration.invoiceNumber || `INV-${moment().format('YYYY')}-${registration._id.toString().substring(0, 6).toUpperCase()}`;
 
-            // Bill To section
-            const billToY = 265;
-            doc.font('Helvetica').fontSize(11).text('Bill To:', 50, billToY);
+            doc.font('Helvetica').fontSize(10).fillColor(textColor);
+            doc.text(`Invoice No : ${invNo}`, 50, invoiceY);
+            doc.text(`Date: ${dateStr}`, 430, invoiceY, { width: 115, align: 'right' });
+
+            // --- BILL TO ---
+            const billToY = 195;
+            doc.font('Helvetica').fontSize(10).text('Bill To:', 50, billToY);
             
-            doc.font('Helvetica').fontSize(10);
+            const clientName = `${registration.firstName || ''} ${registration.lastName || ''}`.trim();
+            const companyName = registration.affiliation || registration.university || '';
+            const address = `${registration.address || ''}, ${registration.city || ''}, ${registration.country || ''}`.trim();
+            const phoneEmail = `${registration.mobileNumber || ''}\n${registration.email || ''}`.trim();
+
             doc.text('Client Name:', 50, billToY + 25);
-            doc.text(`${registration.firstName || ''} ${registration.lastName || ''}`, 130, billToY + 25);
+            doc.text(clientName || '-', 130, billToY + 25);
             
-            doc.text('Company Name:', 280, billToY + 25);
-            doc.text(registration.organization || '-', 380, billToY + 25);
+            doc.text('University:', 280, billToY + 25);
+            doc.text(companyName || '-', 380, billToY + 25);
             
             doc.text('Address:', 50, billToY + 50);
-            doc.text(`${registration.address || ''}, ${registration.city || ''}, ${registration.country || ''}`, 130, billToY + 50, { width: 130 });
+            doc.text(address || '-', 130, billToY + 50, { width: 130 });
             
             doc.text('Phone / Email:', 280, billToY + 50);
-            doc.text(`${registration.mobileNumber || '-'}\n${registration.email || '-'}`, 380, billToY + 50, { width: 170 });
+            doc.text(phoneEmail || '-', 380, billToY + 50, { width: 170 });
 
-            // Table Headers
-            const tableY = 355;
+            // --- TABLE ---
+            const tableY = 285;
             
             // Top dotted line for table header
             doc.lineWidth(1).strokeColor(textColor).dash(2, { space: 2 });
-            doc.moveTo(50, tableY).lineTo(550, tableY).stroke();
+            doc.moveTo(50, tableY).lineTo(545, tableY).stroke();
             doc.undash();
 
-            doc.font('Helvetica-Bold').fontSize(12).fillColor(tableHeaderColor);
-            doc.text('Description', 60, tableY + 15);
-            doc.text('Qty', 300, tableY + 15, { width: 50, align: 'center' });
-            doc.text('Rate', 380, tableY + 15, { width: 60, align: 'center' });
-            doc.text('Amount', 470, tableY + 15, { width: 60, align: 'right' });
+            doc.font('Helvetica-Bold').fontSize(11).fillColor(textColor);
+            doc.text('Description', 50, tableY + 10);
+            doc.text('Category', 200, tableY + 10);
+            doc.text('Qty', 330, tableY + 10, { width: 40, align: 'center' });
+            doc.text('Rate', 390, tableY + 10, { width: 60, align: 'center' });
+            doc.text('Amount', 470, tableY + 10, { width: 75, align: 'right' });
 
             // Bottom dotted line for table header
             doc.dash(2, { space: 2 });
-            doc.moveTo(50, tableY + 40).lineTo(550, tableY + 40).stroke();
+            doc.moveTo(50, tableY + 30).lineTo(545, tableY + 30).stroke();
             doc.undash();
 
-            // Table Row
-            const rowY = tableY + 55;
-            const amountStr = `$${(registration.paymentDetails?.amountTotal || 0).toFixed(2)}`;
-            
-            doc.font('Helvetica-Bold').fontSize(11).fillColor(textColor);
-            doc.text(registration.plan || 'Conference Registration', 60, rowY, { width: 230 });
-            doc.text('1', 300, rowY, { width: 50, align: 'center' });
-            doc.text(amountStr, 380, rowY, { width: 60, align: 'center' });
-            doc.text(amountStr, 470, rowY, { width: 60, align: 'right' });
+            // Table Row Data
+            let currentRowY = tableY + 45;
+            const amountVal = registration.paymentDetails?.amountTotal || 0;
+            const amountStr = `$${amountVal.toFixed(2)}`;
 
-            // Totals section
-            const totalsY = rowY + 100;
-            
-            doc.font('Helvetica-Bold').fontSize(11);
-            doc.text('SUB TOTAL', 350, totalsY);
-            doc.text(amountStr, 470, totalsY, { width: 60, align: 'right' });
-            
-            doc.text('GST', 350, totalsY + 25);
-            doc.text('$0.00', 470, totalsY + 25, { width: 60, align: 'right' });
-            
-            // Dotted line before total
-            doc.dash(2, { space: 2 });
-            doc.moveTo(50, totalsY + 45).lineTo(550, totalsY + 45).stroke();
-            doc.undash();
-            
-            doc.text('TOTAL', 350, totalsY + 55);
-            doc.text(amountStr, 470, totalsY + 55, { width: 60, align: 'right' });
-            
-            // Dotted line after total
-            doc.dash(2, { space: 2 });
-            doc.moveTo(50, totalsY + 75).lineTo(550, totalsY + 75).stroke();
-            doc.undash();
+            const orderDetails = (registration.orderDetails && registration.orderDetails.length > 0)
+                ? registration.orderDetails
+                : [{ name: registration.plan || 'Speaker', price: amountVal, quantity: 1 }];
 
-            // Payment Method Section
-            const pmtY = totalsY + 120;
-            doc.font('Helvetica-Bold').fontSize(11).text('Payment Method', 50, pmtY);
+            const confName = registration.conferenceName || registration.conferenceId || 'Conference Registration';
+            const confDate = registration.conferenceDate || '';
             
+            // We use standard Helvetica for the row data
             doc.font('Helvetica').fontSize(10);
             
-            const rawMethod = registration.paymentDetails?.method || 'Unknown';
-            const methodStr = rawMethod.charAt(0).toUpperCase() + rawMethod.slice(1);
+            doc.text(confName, 50, currentRowY, { width: 140 });
+            const confNameHeight = doc.heightOfString(confName, { width: 140 });
+            if (confDate) {
+                doc.text(confDate, 50, currentRowY + confNameHeight + 5, { width: 140 });
+            }
 
-            doc.text('Payment Mode:', 50, pmtY + 30);
-            doc.text(methodStr, 150, pmtY + 30);
+            orderDetails.forEach((item) => {
+                const qty = item.quantity || 1;
+                const price = parseFloat(item.price) || 0;
+                const subTotal = qty * price;
+                
+                doc.text(item.name, 200, currentRowY, { width: 120 });
+                doc.text(qty.toString().padStart(2, '0'), 330, currentRowY, { width: 40, align: 'center' });
+                doc.text(`$${price.toFixed(2)}`, 390, currentRowY, { width: 60, align: 'center' });
+                doc.text(`$${subTotal.toFixed(2)}`, 470, currentRowY, { width: 75, align: 'right' });
+                
+                const nameHeight = doc.heightOfString(item.name, { width: 120 });
+                currentRowY += Math.max(nameHeight, 20) + 10;
+            });
+
+            const minRowY = tableY + 45 + confNameHeight + 35;
+            if (currentRowY < minRowY) currentRowY = minRowY;
+
+            // --- TOTALS ---
+            const totalsY = currentRowY + 10;
             
-            doc.text('Gateway:', 280, pmtY + 30);
-            doc.text(registration.paymentDetails?.paymentGateway || 'Razorpay', 380, pmtY + 30);
+            // Top dotted line for total
+            doc.dash(2, { space: 2 });
+            doc.moveTo(50, totalsY).lineTo(545, totalsY).stroke();
+            doc.undash();
             
-            doc.text('Transaction ID:', 50, pmtY + 55);
-            doc.text(registration.paymentDetails?.razorpayPaymentId || '-', 150, pmtY + 55);
+            doc.font('Helvetica-Bold').fontSize(11);
+            doc.text('TOTAL', 390, totalsY + 10, { width: 60, align: 'center' });
+            doc.text(amountStr, 470, totalsY + 10, { width: 75, align: 'right' });
             
-            doc.text('IFSC Code:', 280, pmtY + 55);
-            doc.text('-', 380, pmtY + 55);
+            // Bottom dotted line for total
+            doc.dash(2, { space: 2 });
+            doc.moveTo(50, totalsY + 30).lineTo(545, totalsY + 30).stroke();
+            doc.undash();
+
+            // --- IN WORDS ---
+            const wordsY = totalsY + 50;
+            doc.font('Helvetica-Oblique').fontSize(10).text('In words :', 50, wordsY);
+            doc.font('Helvetica-Oblique').text(numberToWords(Math.floor(amountVal)), 110, wordsY);
+
+            // --- ADDRESSES ---
+            const addressY = wordsY + 50;
+            doc.font('Helvetica-Bold').fontSize(10);
+            doc.text('Shipping Address', 50, addressY);
+            doc.text('Billing Address', 280, addressY);
             
-            doc.text('UPI ID:', 50, pmtY + 80);
-            doc.text('-', 150, pmtY + 80);
+            doc.font('Helvetica').fontSize(9);
+            doc.text(address || '-', 50, addressY + 20, { width: 200 });
+            doc.text(address || '-', 280, addressY + 20, { width: 200 }); // Both use the same address as billing in registration logic mostly
+
+            // --- PAYMENT METHOD ---
+            const pmtY = addressY + 70;
+            doc.font('Helvetica-Bold').fontSize(10).text('Payment Method', 50, pmtY);
             
-            doc.text('QR Code:', 280, pmtY + 80);
-            // space for QR code if they ever want one
+            doc.font('Helvetica').fontSize(9);
+            
+            const paymentMethod = registration.paymentDetails?.method || 'Card';
+            const formattedMethod = paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1);
+            
+            doc.text(`Paid By: ${formattedMethod}`, 50, pmtY + 30);
+
+            // --- FOOTER ---
+            const footerLineY = 760;
+            doc.moveTo(50, footerLineY)
+               .lineTo(545, footerLineY)
+               .lineWidth(2)
+               .strokeColor(primaryColor)
+               .stroke();
+               
+            // Footer contact info
+            const contactY = 772;
+            doc.font('Helvetica').fontSize(7).fillColor(textColor);
+            
+            // Using standard text characters to emulate icons
+            doc.text('P +1-7036-516-096', 60, contactY);
+            doc.text('E hello@helixconferences.com', 250, contactY, { width: 150, align: 'center' });
+            doc.text('W www.helixconferences.com', 400, contactY, { width: 145, align: 'right' });
 
             // Bottom Blue Footer Line (using exact A4 width)
             doc.moveTo(0, 810)
                .lineTo(595, 810)
-               .lineWidth(25)
+               .lineWidth(35)
                .strokeColor(primaryColor)
                .stroke();
+               
+            doc.font('Helvetica').fontSize(8).fillColor('#ffffff');
+            doc.text('📍 1200 West 73rd Avenue #1100, Vancouver, British Columbia, Canada', 0, 806, { width: 595, align: 'center' });
 
             doc.end();
         } catch (error) {
