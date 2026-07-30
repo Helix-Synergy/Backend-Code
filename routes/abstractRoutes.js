@@ -191,7 +191,7 @@ router.post("/abstract-submission", upload.single("abstract"), async (req, res) 
  */
 router.get("/abstracts", async (req, res) => {
   try {
-    const abstracts = await Abstract.find().sort({ createdAt: -1 });
+    const abstracts = await Abstract.find().select("-abstractFile.data").sort({ createdAt: -1 });
     res.status(200).json(abstracts);
   } catch (error) {
     console.error("Fetch Error:", error);
@@ -206,9 +206,11 @@ router.get("/abstracts/domain/:domain", async (req, res) => {
   try {
     const domain = req.params.domain;
 
-    const abstracts = await Abstract.find({ websiteDomain: domain }).sort({
-      createdAt: -1,
-    });
+    const abstracts = await Abstract.find({ websiteDomain: domain })
+      .select("-abstractFile.data")
+      .sort({
+        createdAt: -1,
+      });
 
    return res.status(200).json(abstracts);
   } catch (error) {
